@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#fdf9f3" />
+    <meta
+      name="description"
+      content="Chocolates artesanais com cacau 100% rastreável. Trufas, bombons, barras bean-to-bar e o Passaporte Santo Cacau de vantagens."
+    />
+    <title>Santo Cacau — Chocolates artesanais</title>
+    <link rel="icon" href="img/logo.png" />
+    <link rel="apple-touch-icon" href="img/logo.png" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@600;700&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=block"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+    <script src="js/theme.js"></script>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script src="js/tailwind.config.js"></script>
+    <script src="js/empresa.js" defer></script>
+    <script src="js/data.js" defer></script>
+    <script src="js/router.js" defer></script>
+    <script src="js/store.js" defer></script>
+    <script src="js/layout.js" defer></script>
+    <script src="js/a11y.js" defer></script>
+    <script src="js/consent.js" defer></script>
+    <script src="js/pages/inicio.js" defer></script>
+  </head>
+  <body data-route="inicio">
+    <noscript>
+      <p style="padding: 1rem; background: #ffe088; color: #000">
+        Para comprar, ative o JavaScript do seu navegador. Atendimento: contato@santocacau.com.br
+      </p>
+    </noscript>
+    <main id="conteudo">
+      <h1 class="sr-only">Santo Cacau — chocolates artesanais</h1>
+
+      <!-- Destaque sazonal -->
+      <section aria-labelledby="hero-titulo" class="container-sc pt-2">
+        <div class="card relative overflow-hidden rounded-2xl bg-cacau text-on-cacau shadow-xl md:grid md:grid-cols-2">
+          <div class="relative h-56 md:h-full md:min-h-[22rem]">
+            <img
+              src="img/inicio/destaque-fondue-inverno.jpg"
+              alt="Panela de cobre para fondue com chocolate amargo derretido, morangos e marshmallows à luz de lareira."
+              class="w-full h-full object-cover"
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-cacau via-cacau/40 to-transparent md:hidden"></div>
+            <p
+              class="absolute top-3 left-3 bg-secondary-fixed text-on-secondary-fixed px-3 py-1 rounded-full text-label-sm flex items-center gap-1"
+            >
+              <span class="material-symbols-outlined text-[1rem]">ac_unit</span>
+              Edição especial de inverno
+            </p>
+          </div>
+          <div class="relative p-5 md:p-10 -mt-8 md:mt-0 flex flex-col justify-center gap-3">
+            <h2 id="hero-titulo" class="font-titulo text-headline-xl md:text-[2.5rem] md:leading-tight">
+              Festival de Inverno &amp; Fondue Artesanal
+            </h2>
+            <p class="text-body-md text-on-cacau-muted">
+              Receitas exclusivas temperadas em fogo brando com o mais puro cacau selvagem e toques de
+              avelã tostada.
+            </p>
+            <a
+              href="html/produto.html?id=kit-fondue"
+              class="btn tap mt-2 inline-flex items-center justify-center gap-2 py-3.5 px-6 rounded-full bg-secondary-container text-on-secondary-container text-label-lg shadow-md md:self-start"
+            >
+              Conhecer o Kit Fondue
+              <span class="material-symbols-outlined text-[1.25rem]">arrow_forward</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Coleções -->
+      <section aria-labelledby="colecoes-titulo" class="container-sc mt-6">
+        <h2 id="colecoes-titulo" class="text-label-md text-on-surface-variant uppercase tracking-wider mb-2">
+          Navegue por coleção
+        </h2>
+        <ul id="lista-colecoes" class="flex gap-2 overflow-x-auto no-scrollbar py-1 md:flex-wrap"></ul>
+      </section>
+
+      <!-- Destaques -->
+      <section aria-labelledby="destaques-titulo" class="mt-8">
+        <div class="container-sc flex items-end justify-between gap-2 mb-3">
+          <div>
+            <p class="text-label-sm text-secondary uppercase tracking-widest">Ateliê Santo Cacau</p>
+            <h2 id="destaques-titulo" class="font-titulo text-headline-lg text-on-surface">
+              Destaques artesanais
+            </h2>
+          </div>
+          <a href="html/catalogo.html" class="text-label-lg text-secondary underline-offset-2 hover:underline flex items-center tap">
+            Ver todos<span class="sr-only"> os chocolates</span>
+            <span class="material-symbols-outlined text-[1.25rem]">chevron_right</span>
+          </a>
+        </div>
+        <div class="container-sc">
+          <div
+            id="lista-destaques"
+            role="region"
+            aria-label="Destaques artesanais, role para os lados para ver mais"
+            tabindex="0"
+            class="flex gap-4 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0 md:grid md:grid-cols-3 md:overflow-visible snap-x"
+          ></div>
+        </div>
+      </section>
+
+      <!-- Passaporte -->
+      <section aria-labelledby="passaporte-titulo" class="container-sc mt-8">
+        <div class="card relative overflow-hidden rounded-2xl bg-surface-container-high p-5 md:p-8 shadow-md flex flex-col gap-4">
+          <div class="flex items-center gap-3">
+            <span class="w-11 h-11 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined">confirmation_number</span>
+            </span>
+            <div>
+              <p class="text-label-sm text-secondary uppercase tracking-wider">Clube de vantagens</p>
+              <h2 id="passaporte-titulo" class="font-titulo text-headline-md text-on-surface">
+                Passaporte Santo Cacau
+              </h2>
+            </div>
+          </div>
+          <p class="text-body-md text-on-surface-variant max-w-2xl">
+            Cada R$ 1 em compras vira 1 Grão Dourado. Troque por bombons, degustações e workshops — e
+            ganhe <strong class="text-on-surface">100 Grãos</strong> de boas-vindas ao se cadastrar.
+          </p>
+          <ul class="grid grid-cols-3 gap-2 max-w-xl">
+            <li class="flex flex-col items-center text-center p-3 rounded-lg bg-surface-container-lowest">
+              <span class="material-symbols-outlined text-secondary mb-1">local_shipping</span>
+              <span class="text-label-md text-on-surface">Frete grátis no nível Ouro</span>
+            </li>
+            <li class="flex flex-col items-center text-center p-3 rounded-lg bg-surface-container-lowest">
+              <span class="material-symbols-outlined text-secondary mb-1">redeem</span>
+              <span class="text-label-md text-on-surface">Mimo de aniversário</span>
+            </li>
+            <li class="flex flex-col items-center text-center p-3 rounded-lg bg-surface-container-lowest">
+              <span class="material-symbols-outlined text-secondary mb-1">local_cafe</span>
+              <span class="text-label-md text-on-surface">Degustações exclusivas</span>
+            </li>
+          </ul>
+          <a
+            href="html/passaporte.html"
+            class="btn tap w-full md:w-auto md:self-start py-3.5 px-6 rounded-full bg-primary text-on-primary text-label-lg flex items-center justify-center gap-2"
+          >
+            Saiba mais e participe
+            <span class="material-symbols-outlined text-[1.25rem]">arrow_forward</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- Origem e depoimento -->
+      <section aria-label="Nossa origem e opinião de clientes" class="container-sc mt-8 grid gap-4 md:grid-cols-2">
+        <div class="card rounded-2xl bg-surface-container p-5 flex items-start gap-4">
+          <span class="w-14 h-14 rounded-full bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[1.75rem]">nature_people</span>
+          </span>
+          <div>
+            <p class="text-label-sm uppercase tracking-wider text-secondary flex items-center gap-1">
+              100% rastreável <span class="material-symbols-outlined text-[1rem]">verified</span>
+            </p>
+            <h2 class="text-title-lg text-on-surface">Cacau de origem controlada</h2>
+            <p class="text-body-sm text-on-surface-variant mt-1">
+              Apoiamos pequenos agricultores familiares da Mata Atlântica e da Floresta Amazônica com
+              comércio justo e preservação florestal.
+            </p>
+          </div>
+        </div>
+        <figure class="card rounded-2xl bg-surface-container-low p-5 flex flex-col gap-3">
+          <div class="flex items-center justify-between gap-2">
+            <figcaption class="flex items-center gap-3">
+              <span aria-hidden="true" class="w-10 h-10 rounded-full bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center text-title-md">M</span>
+              <span>
+                <span class="block text-title-md text-on-surface">Marina Duarte</span>
+                <span class="block text-body-sm text-on-surface-variant">Membro Cacau Ouro • compra verificada</span>
+              </span>
+            </figcaption>
+            <p class="flex text-secondary">
+              <span class="sr-only">Avaliação: 5 de 5 estrelas</span>
+              <span class="material-symbols-outlined icon-fill text-[1rem]">star</span>
+              <span class="material-symbols-outlined icon-fill text-[1rem]">star</span>
+              <span class="material-symbols-outlined icon-fill text-[1rem]">star</span>
+              <span class="material-symbols-outlined icon-fill text-[1rem]">star</span>
+              <span class="material-symbols-outlined icon-fill text-[1rem]">star</span>
+            </p>
+          </div>
+          <blockquote class="text-body-md text-on-surface-variant italic">
+            “O festival de inverno superou todas as expectativas. O chocolate derrete no paladar com
+            notas amendoadas que só a Santo Cacau consegue temperar.”
+          </blockquote>
+        </figure>
+      </section>
+
+      <!-- Acessibilidade em destaque -->
+      <section aria-labelledby="inclusao-titulo" class="container-sc mt-8">
+        <div class="card rounded-2xl border-2 border-outline-variant p-5 flex flex-col md:flex-row md:items-center gap-4">
+          <span class="w-12 h-12 rounded-full bg-primary text-on-primary flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined">accessibility_new</span>
+          </span>
+          <div class="flex-1">
+            <h2 id="inclusao-titulo" class="text-title-lg text-on-surface">Um site para todas as pessoas</h2>
+            <p class="text-body-sm text-on-surface-variant">
+              Ajuste o tamanho do texto, ative alto contraste, ouça a página em voz alta ou use o
+              tradutor de Libras. Nossas boutiques também têm acesso sem degraus e cardápio em braille.
+            </p>
+          </div>
+          <button
+            type="button"
+            data-abrir-a11y
+            class="btn tap px-5 rounded-full bg-primary text-on-primary text-label-lg flex items-center justify-center gap-2"
+          >
+            <span class="material-symbols-outlined">tune</span>
+            Abrir opções de acessibilidade
+          </button>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

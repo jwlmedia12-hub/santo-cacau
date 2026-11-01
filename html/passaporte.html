@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#fdf9f3" />
+    <meta name="description" content="Passaporte Santo Cacau: acumule Grãos Dourados e troque por chocolates, degustações e workshops." />
+    <title>Passaporte Santo Cacau — Clube de vantagens</title>
+    <link rel="icon" href="../img/logo.png" />
+    <link rel="apple-touch-icon" href="../img/logo.png" />
+    <link rel="manifest" href="../manifest.webmanifest" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@600;700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=block" />
+    <link rel="stylesheet" href="../css/styles.css" />
+    <script src="../js/theme.js"></script>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script src="../js/tailwind.config.js"></script>
+    <script src="../js/empresa.js" defer></script>
+    <script src="../js/data.js" defer></script>
+    <script src="../js/router.js" defer></script>
+    <script src="../js/store.js" defer></script>
+    <script src="../js/layout.js" defer></script>
+    <script src="../js/a11y.js" defer></script>
+    <script src="../js/consent.js" defer></script>
+    <script src="../js/pages/passaporte.js" defer></script>
+  </head>
+  <body data-route="passaporte">
+    <noscript><p style="padding: 1rem; background: #ffe088; color: #000">Ative o JavaScript para usar o Passaporte.</p></noscript>
+    <main id="conteudo">
+      <div class="container-sc flex flex-col gap-8">
+        <!-- Apresentação -->
+        <section aria-labelledby="titulo" class="card relative overflow-hidden rounded-2xl bg-cacau text-on-cacau p-6 md:p-10 shadow-md flex flex-col items-start gap-3 mt-2">
+          <p class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-ouro text-on-ouro text-label-sm uppercase tracking-wider">
+            <span class="material-symbols-outlined icon-fill text-[1rem]">stars</span>Clube de vantagens
+          </p>
+          <h1 id="titulo" class="font-titulo text-headline-xl md:text-[2.5rem]">Passaporte Santo Cacau</h1>
+          <p class="text-body-md text-on-cacau-muted max-w-xl">
+            Seu portal para experiências sensoriais exclusivas, aromas nobres e degustações
+            inesquecíveis. Participar é gratuito.
+          </p>
+          <div id="cta-passaporte" class="flex flex-wrap gap-2 pt-2"></div>
+        </section>
+
+        <!-- Como funciona -->
+        <section aria-labelledby="como-funciona-titulo" id="como-funciona" class="flex flex-col gap-4">
+          <div>
+            <p class="text-label-sm text-secondary uppercase tracking-widest">Ritual &amp; reconhecimento</p>
+            <h2 id="como-funciona-titulo" class="font-titulo text-headline-lg">Como funciona</h2>
+          </div>
+          <ol class="grid gap-3 md:grid-cols-3">
+            <li class="card rounded-xl bg-surface-container-low p-4 flex gap-3">
+              <span class="w-11 h-11 rounded-full bg-cacau text-ouro flex items-center justify-center shrink-0"><span class="material-symbols-outlined">person_add</span></span>
+              <span><span class="block text-title-md">1. Cadastre-se grátis</span><span class="block text-body-sm text-on-surface-variant">E ganhe 100 Grãos Dourados de boas-vindas.</span></span>
+            </li>
+            <li class="card rounded-xl bg-surface-container-low p-4 flex gap-3">
+              <span class="w-11 h-11 rounded-full bg-cacau text-ouro flex items-center justify-center shrink-0"><span class="material-symbols-outlined">savings</span></span>
+              <span><span class="block text-title-md">2. R$ 1 = 1 Grão Dourado</span><span class="block text-body-sm text-on-surface-variant">Em compras no site, no app e nas boutiques.</span></span>
+            </li>
+            <li class="card rounded-xl bg-surface-container-low p-4 flex gap-3">
+              <span class="w-11 h-11 rounded-full bg-cacau text-ouro flex items-center justify-center shrink-0"><span class="material-symbols-outlined">redeem</span></span>
+              <span><span class="block text-title-md">3. Troque e suba de nível</span><span class="block text-body-sm text-on-surface-variant">200 Grãos = R$ 15 de desconto, ou troque por mimos e experiências.</span></span>
+            </li>
+          </ol>
+        </section>
+
+        <!-- Níveis -->
+        <section aria-labelledby="niveis-titulo" class="flex flex-col gap-3">
+          <h2 id="niveis-titulo" class="font-titulo text-headline-lg">Níveis de apreciação</h2>
+          <p class="text-body-sm text-on-surface-variant">O nível é definido pelo total de Grãos acumulados. Use as setas do teclado para trocar de nível.</p>
+          <div id="niveis-abas" role="tablist" aria-label="Níveis do Passaporte" class="flex gap-2 overflow-x-auto no-scrollbar py-1"></div>
+          <div id="niveis-paineis"></div>
+        </section>
+
+        <!-- Vantagens -->
+        <section aria-labelledby="vantagens-titulo" class="flex flex-col gap-3">
+          <h2 id="vantagens-titulo" class="font-titulo text-headline-lg">Vantagens que você conquista</h2>
+          <ul class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <li class="card p-4 rounded-xl bg-surface-container-low flex flex-col gap-1">
+              <span class="material-symbols-outlined text-secondary text-[1.75rem]">bakery_dining</span>
+              <span class="text-title-md">Trufas cortesia</span>
+              <span class="text-body-sm text-on-surface-variant">Em datas comemorativas e a cada meta alcançada.</span>
+            </li>
+            <li class="card p-4 rounded-xl bg-surface-container-low flex flex-col gap-1">
+              <span class="material-symbols-outlined text-secondary text-[1.75rem]">redeem</span>
+              <span class="text-title-md">Caixas especiais</span>
+              <span class="text-body-sm text-on-surface-variant">Kits presenteáveis selecionados pelos mestres.</span>
+            </li>
+            <li class="card p-4 rounded-xl bg-surface-container-low flex flex-col gap-1">
+              <span class="material-symbols-outlined text-secondary text-[1.75rem]">local_cafe</span>
+              <span class="text-title-md">Degustações guiadas</span>
+              <span class="text-body-sm text-on-surface-variant">Vivências sensoriais exclusivas nas boutiques.</span>
+            </li>
+            <li class="card p-4 rounded-xl bg-surface-container-low flex flex-col gap-1">
+              <span class="material-symbols-outlined text-secondary text-[1.75rem]">school</span>
+              <span class="text-title-md">Workshops VIP</span>
+              <span class="text-body-sm text-on-surface-variant">Aulas práticas de chocolateria com chefs convidados.</span>
+            </li>
+          </ul>
+        </section>
+
+        <!-- Experiências -->
+        <section aria-labelledby="experiencias-titulo" id="experiencias" tabindex="-1" class="flex flex-col gap-3">
+          <div>
+            <p class="text-label-sm text-secondary uppercase tracking-widest">Nas boutiques</p>
+            <h2 id="experiencias-titulo" class="font-titulo text-headline-lg">Experiências em loja</h2>
+          </div>
+          <ul id="lista-experiencias" class="grid gap-4 md:grid-cols-3"></ul>
+        </section>
+
+        <!-- Boutiques -->
+        <section aria-labelledby="boutiques-titulo" class="flex flex-col gap-3">
+          <h2 id="boutiques-titulo" class="font-titulo text-headline-lg">Boutiques participantes</h2>
+          <ul id="lista-boutiques" class="grid gap-3 md:grid-cols-3"></ul>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>

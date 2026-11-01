@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#fdf9f3" />
+    <meta name="description" content="Perguntas frequentes e canais de atendimento da Santo Cacau." />
+    <title>Central de ajuda — Santo Cacau</title>
+    <link rel="icon" href="../img/logo.png" />
+    <link rel="manifest" href="../manifest.webmanifest" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@600;700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=block" />
+    <link rel="stylesheet" href="../css/styles.css" />
+    <script src="../js/theme.js"></script>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script src="../js/tailwind.config.js"></script>
+    <script src="../js/empresa.js" defer></script>
+    <script src="../js/data.js" defer></script>
+    <script src="../js/router.js" defer></script>
+    <script src="../js/store.js" defer></script>
+    <script src="../js/layout.js" defer></script>
+    <script src="../js/a11y.js" defer></script>
+    <script src="../js/consent.js" defer></script>
+    <script src="../js/pages/ajuda.js" defer></script>
+  </head>
+  <body data-route="ajuda">
+    <main id="conteudo">
+      <div class="container-sc flex flex-col gap-8 pt-2">
+        <header class="flex flex-col gap-1">
+          <p class="text-label-sm text-secondary uppercase tracking-widest">Atendimento</p>
+          <h1 class="font-titulo text-headline-xl">Central de ajuda</h1>
+          <p class="text-body-md text-on-surface-variant">Encontre respostas rápidas ou fale com a nossa equipe.</p>
+        </header>
+
+        <!-- Canais -->
+        <section aria-labelledby="canais-titulo">
+          <h2 id="canais-titulo" class="sr-only">Canais de atendimento</h2>
+          <ul class="grid gap-3 sm:grid-cols-3">
+            <li>
+              <a id="link-whatsapp" target="_blank" rel="noopener" class="card h-full rounded-xl bg-surface-container-low p-4 flex items-center gap-3 hover:bg-surface-container">
+                <span class="w-11 h-11 rounded-full bg-sucesso text-surface flex items-center justify-center shrink-0"><span class="material-symbols-outlined">chat</span></span>
+                <span><span class="block text-title-md">WhatsApp</span><span class="block text-body-sm text-on-surface-variant" data-empresa="whatsapp"></span><span class="sr-only"> (abre em nova janela)</span></span>
+              </a>
+            </li>
+            <li>
+              <a id="link-telefone" class="card h-full rounded-xl bg-surface-container-low p-4 flex items-center gap-3 hover:bg-surface-container">
+                <span class="w-11 h-11 rounded-full bg-primary text-on-primary flex items-center justify-center shrink-0"><span class="material-symbols-outlined">call</span></span>
+                <span><span class="block text-title-md">Telefone</span><span class="block text-body-sm text-on-surface-variant" data-empresa="telefone"></span></span>
+              </a>
+            </li>
+            <li>
+              <a id="link-email" class="card h-full rounded-xl bg-surface-container-low p-4 flex items-center gap-3 hover:bg-surface-container">
+                <span class="w-11 h-11 rounded-full bg-secondary text-on-secondary flex items-center justify-center shrink-0"><span class="material-symbols-outlined">mail</span></span>
+                <span class="min-w-0"><span class="block text-title-md">E-mail</span><span class="block text-body-sm text-on-surface-variant break-all" data-empresa="email"></span></span>
+              </a>
+            </li>
+          </ul>
+          <p class="mt-2 text-body-sm text-on-surface-variant">Horário: <span data-empresa="horarioAtendimento"></span>. Pelo WhatsApp você pode enviar texto, áudio ou vídeo em Libras.</p>
+        </section>
+
+        <!-- Perguntas frequentes -->
+        <section aria-labelledby="faq-titulo" class="flex flex-col gap-3">
+          <h2 id="faq-titulo" class="font-titulo text-headline-lg">Perguntas frequentes</h2>
+          <div class="grid gap-2 lg:grid-cols-2 lg:items-start">
+            <details class="rounded-xl border border-outline-variant bg-surface-container-lowest">
+              <summary class="tap cursor-pointer px-4 py-3 text-label-lg">Qual o prazo de entrega?</summary>
+              <p class="px-4 pb-4 text-body-md text-on-surface-variant">Na capital de São Paulo, a entrega expressa chega no mesmo dia para pedidos pagos até 14h. Nas demais regiões, a entrega padrão refrigerada leva de 3 a 6 dias úteis. Você também pode retirar na Boutique Jardins em até 2 horas.</p>
+            </details>
+            <details class="rounded-xl border border-outline-variant bg-surface-container-lowest">
+              <summary class="tap cursor-pointer px-4 py-3 text-label-lg">O chocolate chega derretido?</summary>
+              <p class="px-4 pb-4 text-body-md text-on-surface-variant">Enviamos em embalagem térmica com gelo reutilizável. Se mesmo assim chegar avariado, avise em até 30 dias e trocamos ou reembolsamos. Veja a <a class="underline text-secondary font-semibold" href="trocas.html">política de trocas</a>.</p>
+            </details>
+            <details class="rounded-xl border border-outline-variant bg-surface-container-lowest">
+              <summary class="tap cursor-pointer px-4 py-3 text-label-lg">Quais formas de pagamento vocês aceitam?</summary>
+              <p class="px-4 pb-4 text-body-md text-on-surface-variant">Pix (aprovação imediata) e cartão de crédito em até 3x sem juros, com parcela mínima de R$ 30.</p>
+            </details>
+            <details class="rounded-xl border border-outline-variant bg-surface-container-lowest">
+              <summary class="tap cursor-pointer px-4 py-3 text-label-lg">Como funcionam os Grãos Dourados?</summary>
+              <p class="px-4 pb-4 text-body-md text-on-surface-variant">Cada R$ 1 em produtos vira 1 Grão. Com 200 Grãos você ganha R$ 15 de desconto, ou troca por recompensas e experiências. Saiba mais no <a class="underline text-secondary font-semibold" href="passaporte.html">Passaporte</a>.</p>
+            </details>
+            <details class="rounded-xl border border-outline-variant bg-surface-container-lowest">
+              <summary class="tap cursor-pointer px-4 py-3 text-label-lg">Tenho alergia ou restrição alimentar. Como escolher?</summary>
+              <p class="px-4 pb-4 text-body-md text-on-surface-variant">Cada produto mostra ingredientes, alérgicos e se contém glúten. No catálogo, use o filtro “Dieta e restrições” (vegano, sem glúten, sem lactose, sem açúcar adicionado). Produzimos em cozinha que manipula leite, castanhas e amendoim.</p>
+            </details>
+            <details class="rounded-xl border border-outline-variant bg-surface-container-lowest">
+              <summary class="tap cursor-pointer px-4 py-3 text-label-lg">Posso desistir da compra?</summary>
+              <p class="px-4 pb-4 text-body-md text-on-surface-variant">Sim. Em compras online você tem 7 dias após o recebimento para desistir, com reembolso integral, inclusive do frete.</p>
+            </details>
+            <details class="rounded-xl border border-outline-variant bg-surface-container-lowest">
+              <summary class="tap cursor-pointer px-4 py-3 text-label-lg">Como uso os recursos de acessibilidade?</summary>
+              <p class="px-4 pb-4 text-body-md text-on-surface-variant">Toque no ícone de acessibilidade no topo de qualquer página para aumentar o texto, ativar alto contraste, ouvir a página ou usar o tradutor de Libras. Detalhes na <a class="underline text-secondary font-semibold" href="acessibilidade.html">Declaração de Acessibilidade</a>.</p>
+            </details>
+            <details class="rounded-xl border border-outline-variant bg-surface-container-lowest">
+              <summary class="tap cursor-pointer px-4 py-3 text-label-lg">Como vejo, corrijo ou apago meus dados?</summary>
+              <p class="px-4 pb-4 text-body-md text-on-surface-variant">Em <a class="underline text-secondary font-semibold" href="dashboard.html#privacidade">Minha conta › Privacidade</a> você baixa uma cópia dos dados, revoga ofertas e exclui a conta. Também pode escrever para <a class="underline text-secondary font-semibold" data-empresa="encarregadoEmail" data-empresa-link="mailto" href="#"></a>.</p>
+            </details>
+          </div>
+        </section>
+
+        <!-- Formulário -->
+        <section id="contato" tabindex="-1" aria-labelledby="contato-titulo" class="flex flex-col gap-3">
+          <h2 id="contato-titulo" class="font-titulo text-headline-lg">Envie uma mensagem</h2>
+          <p class="text-body-sm text-on-surface-variant">Campos com * são obrigatórios. Respondemos em até 2 dias úteis.</p>
+          <form id="form-contato" novalidate class="card rounded-xl bg-surface-container-lowest shadow-sm p-4 md:p-6 grid gap-4 md:grid-cols-2">
+            <div>
+              <label for="ct-nome" class="block text-label-lg mb-1">Nome <span aria-hidden="true">*</span></label>
+              <input id="ct-nome" class="campo" autocomplete="name" required />
+            </div>
+            <div>
+              <label for="ct-email" class="block text-label-lg mb-1">E-mail <span aria-hidden="true">*</span></label>
+              <input id="ct-email" type="email" inputmode="email" class="campo" autocomplete="email" required />
+            </div>
+            <div>
+              <label for="ct-assunto" class="block text-label-lg mb-1">Assunto <span aria-hidden="true">*</span></label>
+              <select id="ct-assunto" class="campo" required>
+                <option value="">Selecione</option>
+                <option>Dúvida sobre pedido</option>
+                <option>Troca ou devolução</option>
+                <option>Produtos e alérgicos</option>
+                <option>Passaporte e Grãos</option>
+                <option>Acessibilidade</option>
+                <option>Direitos LGPD (meus dados)</option>
+                <option>Elogio ou sugestão</option>
+                <option>Outro</option>
+              </select>
+            </div>
+            <div>
+              <label for="ct-pedido" class="block text-label-lg mb-1">Número do pedido (opcional)</label>
+              <input id="ct-pedido" class="campo" placeholder="Ex.: SC12345678" autocomplete="off" />
+            </div>
+            <div class="md:col-span-2">
+              <label for="ct-mensagem" class="block text-label-lg mb-1">Mensagem <span aria-hidden="true">*</span></label>
+              <textarea id="ct-mensagem" rows="5" maxlength="2000" class="campo" required aria-describedby="ct-contador"></textarea>
+              <p id="ct-contador" class="text-body-sm text-on-surface-variant mt-1">Até 2.000 caracteres.</p>
+            </div>
+            <fieldset class="md:col-span-2">
+              <legend class="text-label-lg mb-2">Como prefere receber a resposta?</legend>
+              <div class="flex flex-wrap gap-x-6 gap-y-2">
+                <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="ct-canal" value="E-mail" checked /><span class="text-body-md">E-mail</span></label>
+                <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="ct-canal" value="WhatsApp (texto)" /><span class="text-body-md">WhatsApp em texto</span></label>
+                <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="ct-canal" value="Vídeo em Libras" /><span class="text-body-md">Vídeo em Libras</span></label>
+                <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="ct-canal" value="Ligação" /><span class="text-body-md">Ligação</span></label>
+              </div>
+            </fieldset>
+            <p class="md:col-span-2 text-body-sm text-on-surface-variant">
+              Usaremos estes dados apenas para responder você, conforme a <a class="underline text-secondary font-semibold" href="privacidade.html">Política de Privacidade</a>.
+            </p>
+            <div class="md:col-span-2">
+              <button class="btn tap px-6 h-12 rounded-full bg-primary text-on-primary text-label-lg flex items-center gap-2">
+                <span class="material-symbols-outlined">send</span>Enviar mensagem
+              </button>
+            </div>
+          </form>
+          <div id="contato-ok" hidden tabindex="-1" class="card rounded-xl bg-sucesso-container text-on-sucesso-container p-4 flex flex-col gap-2"></div>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>

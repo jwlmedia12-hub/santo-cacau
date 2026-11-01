@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#fdf9f3" />
+    <meta name="description" content="Direito de arrependimento, trocas, devoluções e reembolsos na Santo Cacau." />
+    <title>Trocas e Devoluções — Santo Cacau</title>
+    <link rel="icon" href="../img/logo.png" />
+    <link rel="manifest" href="../manifest.webmanifest" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@600;700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=block" />
+    <link rel="stylesheet" href="../css/styles.css" />
+    <script src="../js/theme.js"></script>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script src="../js/tailwind.config.js"></script>
+    <script src="../js/empresa.js" defer></script>
+    <script src="../js/data.js" defer></script>
+    <script src="../js/router.js" defer></script>
+    <script src="../js/store.js" defer></script>
+    <script src="../js/layout.js" defer></script>
+    <script src="../js/a11y.js" defer></script>
+    <script src="../js/consent.js" defer></script>
+    <script src="../js/pages/legal.js" defer></script>
+  </head>
+  <body data-route="trocas">
+    <main id="conteudo">
+      <div class="container-estreito max-w-3xl flex flex-col gap-6 pt-2">
+        <header class="flex flex-col gap-2">
+          <p class="text-label-sm text-secondary uppercase tracking-widest">Políticas</p>
+          <h1 class="font-titulo text-headline-xl">Trocas, Devoluções e Arrependimento</h1>
+          <p class="text-body-sm text-on-surface-variant">Última atualização: <span data-empresa="atualizacaoPoliticas"></span></p>
+          <div id="acoes-pagina" class="flex flex-wrap gap-2"></div>
+        </header>
+
+        <ul class="grid gap-3 sm:grid-cols-3">
+          <li class="card rounded-xl bg-surface-container-low p-4">
+            <p class="text-headline-md font-bold text-secondary">7 dias</p>
+            <p class="text-body-sm">para desistir de compras online, sem justificativa</p>
+          </li>
+          <li class="card rounded-xl bg-surface-container-low p-4">
+            <p class="text-headline-md font-bold text-secondary">30 dias</p>
+            <p class="text-body-sm">para reclamar de produto com defeito ou avaria</p>
+          </li>
+          <li class="card rounded-xl bg-surface-container-low p-4">
+            <p class="text-headline-md font-bold text-secondary">Sem custo</p>
+            <p class="text-body-sm">coleta e reembolso integral, inclusive do frete</p>
+          </li>
+        </ul>
+
+        <div id="sumario"></div>
+
+        <article class="prose-legal">
+          <h2>Direito de arrependimento</h2>
+          <p>
+            Em compras feitas pelo site ou aplicativo, você pode desistir em até <strong>7 dias corridos</strong> a partir do
+            recebimento, sem precisar explicar o motivo (Código de Defesa do Consumidor, art. 49). Devolvemos todos os valores
+            pagos, incluindo o frete.
+          </p>
+          <p>
+            Como chocolates são perecíveis, pedimos que, se possível, você nos avise logo e mantenha o produto em local fresco
+            até a coleta.
+          </p>
+
+          <h2>Produto com defeito, derretido ou avariado</h2>
+          <p>
+            Se o produto chegar derretido, quebrado, com embalagem violada ou diferente do pedido, avise em até
+            <strong>30 dias</strong> (CDC, art. 26, I). Se puder, envie uma foto — isso agiliza, mas não é obrigatório. Você
+            escolhe entre:
+          </p>
+          <ul>
+            <li>troca por outro produto igual ou equivalente;</li>
+            <li>reembolso integral; ou</li>
+            <li>abatimento proporcional no valor.</li>
+          </ul>
+
+          <h2>Como solicitar</h2>
+          <ol>
+            <li>Acesse a <a href="ajuda.html#contato">Central de ajuda</a> e escolha o assunto “Troca ou devolução”, ou fale pelo WhatsApp <span data-empresa="whatsapp"></span>.</li>
+            <li>Informe o número do pedido (está em Minha conta › Pedidos e no e-mail de confirmação).</li>
+            <li>Agendaremos a coleta gratuita no endereço de entrega, ou você pode devolver em qualquer boutique.</li>
+          </ol>
+
+          <h2>Prazos de reembolso</h2>
+          <table>
+            <caption class="sr-only">Prazos de reembolso por forma de pagamento</caption>
+            <thead><tr><th scope="col">Forma de pagamento</th><th scope="col">Como e quando</th></tr></thead>
+            <tbody>
+              <tr><td>Pix</td><td>Devolução na mesma conta em até 5 dias úteis após recebermos o produto</td></tr>
+              <tr><td>Cartão de crédito</td><td>Estorno solicitado em até 5 dias úteis; aparece em 1 ou 2 faturas, conforme o banco</td></tr>
+            </tbody>
+          </table>
+          <p>Grãos Dourados usados no pedido voltam ao seu saldo, e os ganhos com ele são estornados.</p>
+
+          <h2>Compras nas boutiques</h2>
+          <p>
+            Em compras presenciais não existe o direito de arrependimento de 7 dias, mas trocamos produtos com defeito em até 30
+            dias, conforme o CDC. Trocas por gosto podem ser feitas em até 3 dias com a embalagem intacta e a nota fiscal.
+          </p>
+
+          <h2>Atendimento acessível</h2>
+          <p>
+            Você pode pedir troca ou devolução pelo canal que preferir: texto no WhatsApp, e-mail, telefone ou presencialmente,
+            com atendimento em Libras na Boutique Jardins às sextas-feiras. Veja a
+            <a href="acessibilidade.html">Declaração de Acessibilidade</a>.
+          </p>
+        </article>
+      </div>
+    </main>
+  </body>
+</html>

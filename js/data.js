@@ -1,0 +1,390 @@
+/**
+ * Santo Cacau — dados do catálogo, do Passaporte e das boutiques.
+ *
+ * Em produção, estes dados viriam de uma API/ERP. Mantê-los aqui permite que
+ * o site funcione sozinho em qualquer hospedagem estática. Caminhos de imagem
+ * são relativos à raiz do site (www/).
+ */
+window.SC_DATA = {
+  produtos: [
+    {
+      id: 'caixa-selecao-dourada',
+      nome: 'Caixa Seleção Dourada Santo Cacau',
+      categoria: 'Caixas',
+      colecoes: ['exclusivas', 'presentes', 'mais-vendidos'],
+      selo: 'Edição Assinatura',
+      img: 'img/catalogo/caixa-selecao-dourada.jpg',
+      alt: 'Caixa de presente aberta com bombons e trufas pintados em dourado, acomodados em divisórias de veludo marrom.',
+      preco: 56.9,
+      unidade: '200 g • 12 bombons',
+      teor: '40% a 70% cacau',
+      intensidades: ['leite', 'intenso'],
+      dietas: ['sem-gluten'],
+      resumo:
+        'Gianduia aveludada, praliné de pistache e ganache de maracujá selvagem selados em ouro comestível.',
+      descricao:
+        'Nosso sortimento mais celebrado: 12 bombons feitos à mão com recheios de gianduia, praliné de pistache, ganache de maracujá e caramelo de baunilha do Cerrado. Finalizados com pó de ouro comestível e acondicionados em caixa rígida com fita dourada.',
+      ingredientes:
+        'Chocolate ao leite (açúcar, manteiga de cacau, leite integral em pó, massa de cacau, emulsificante lecitina de soja), chocolate meio amargo, creme de leite, pistache, avelã, polpa de maracujá, açúcar, glucose, manteiga, baunilha, corante natural ouro comestível.',
+      alergicos:
+        'ALÉRGICOS: CONTÉM LEITE E DERIVADOS, SOJA, PISTACHE E AVELÃ. PODE CONTER AMÊNDOA, CASTANHA-DE-CAJU E AMENDOIM.',
+      gluten: 'NÃO CONTÉM GLÚTEN.',
+      alcool: false,
+      nota: 4.9,
+      avaliacoes: 214,
+      destaque: false,
+    },
+    {
+      id: 'caixa-bombons-ouro-24k',
+      nome: 'Caixa Bombons Ouro 24k',
+      categoria: 'Caixas',
+      colecoes: ['exclusivas', 'presentes'],
+      selo: 'Edição Ouro',
+      img: 'img/inicio/caixa-bombons.jpg',
+      alt: 'Caixa luxuosa com bombons de chocolate escuro decorados com lascas de ouro comestível sobre tecido de seda.',
+      preco: 119,
+      unidade: '8 bombons • 160 g',
+      teor: '55% cacau',
+      intensidades: ['intenso'],
+      dietas: [],
+      resumo: '8 bombons recheados com ganache de praliné crocante e folhas de ouro.',
+      descricao:
+        'Bombons de chocolate 55% com recheio de praliné crocante de avelã e ganache de café, decorados com folhas de ouro 24k comestível. Uma caixa pensada para presentear em grandes ocasiões.',
+      ingredientes:
+        'Chocolate meio amargo (massa de cacau, açúcar, manteiga de cacau, emulsificante lecitina de soja), avelã, açúcar, creme de leite, café, biscoito wafer (farinha de trigo, açúcar), ouro comestível 24k.',
+      alergicos:
+        'ALÉRGICOS: CONTÉM AVELÃ, LEITE E DERIVADOS, SOJA E TRIGO. PODE CONTER AMÊNDOA, CASTANHA-DE-CAJU E AMENDOIM.',
+      gluten: 'CONTÉM GLÚTEN.',
+      alcool: false,
+      nota: 4.9,
+      avaliacoes: 128,
+      destaque: true,
+    },
+    {
+      id: 'trufas-nobres-70',
+      nome: 'Trufas Nobres 70% Cacau',
+      categoria: 'Trufas',
+      colecoes: ['trufas', 'mais-vendidos'],
+      selo: 'Origem Bahia',
+      img: 'img/inicio/trufas-aveludadas.jpg',
+      alt: 'Trufas de chocolate amargo polvilhadas com cacau sobre ardósia escura, com amêndoas de cacau ao redor.',
+      preco: 68.5,
+      unidade: 'Caixa 180 g • 12 trufas',
+      teor: '70% cacau',
+      intensidades: ['intenso'],
+      dietas: ['sem-gluten'],
+      resumo: 'Cacau nativo de Ilhéus, polvilhadas em cacau puro e notas de especiarias.',
+      descricao:
+        'Trufas de ganache 70% com cacau de origem única de Ilhéus (BA), aromatizadas com canela e cardamomo e polvilhadas em cacau puro. Textura que derrete no paladar.',
+      ingredientes:
+        'Chocolate amargo 70% (massa de cacau, açúcar, manteiga de cacau), creme de leite, manteiga, cacau em pó, canela, cardamomo.',
+      alergicos: 'ALÉRGICOS: CONTÉM LEITE E DERIVADOS. PODE CONTER AVELÃ, AMÊNDOA E SOJA.',
+      gluten: 'NÃO CONTÉM GLÚTEN.',
+      alcool: false,
+      nota: 5,
+      avaliacoes: 94,
+      destaque: true,
+    },
+    {
+      id: 'trufa-caramelo-salgado',
+      nome: 'Trufa Belga Caramelo Salgado & Flor de Sal',
+      categoria: 'Trufas',
+      colecoes: ['trufas', 'mais-vendidos'],
+      selo: 'Unidade Gourmet',
+      img: 'img/catalogo/trufa-caramelo-salgado.jpg',
+      alt: 'Trufa cortada ao meio revelando recheio cremoso de caramelo salgado, com cristais de flor de sal por cima.',
+      preco: 6.5,
+      unidade: 'Unidade 30 g',
+      teor: 'Ao leite 38% cacau',
+      intensidades: ['leite'],
+      dietas: ['sem-gluten'],
+      resumo:
+        'Coração líquido de doce de leite artesanal com cristais de flor de sal e casca crocante.',
+      descricao:
+        'Casca fina de chocolate belga ao leite 38% com recheio fluido de caramelo de doce de leite e cristais de flor de sal de Guérande.',
+      ingredientes:
+        'Chocolate ao leite (açúcar, manteiga de cacau, leite integral em pó, massa de cacau, emulsificante lecitina de soja), doce de leite, creme de leite, manteiga, flor de sal.',
+      alergicos: 'ALÉRGICOS: CONTÉM LEITE E DERIVADOS E SOJA. PODE CONTER AVELÃ E AMÊNDOA.',
+      gluten: 'NÃO CONTÉM GLÚTEN.',
+      alcool: false,
+      nota: 4.8,
+      avaliacoes: 311,
+      destaque: false,
+    },
+    {
+      id: 'barra-gran-reserva-75',
+      nome: 'Barra Gran Reserva Cacau Bahia 75%',
+      categoria: 'Barras',
+      colecoes: ['veganos'],
+      selo: 'Bean-to-bar',
+      img: 'img/catalogo/barra-gran-reserva.jpg',
+      alt: 'Barra de chocolate amargo partida em pedaços sobre frutos de cacau e amêndoas torradas em mesa de madeira.',
+      preco: 19.9,
+      unidade: 'Barra 80 g',
+      teor: '75% cacau',
+      intensidades: ['intenso'],
+      dietas: ['vegano', 'sem-lactose', 'sem-gluten'],
+      resumo: 'Bean-to-bar com amêndoas de Ilhéus. Notas de frutas vermelhas e tabaco suave.',
+      descricao:
+        'Produzida no conceito bean-to-bar, da amêndoa à barra, com cacau fino de Ilhéus fermentado por 7 dias. Notas de frutas vermelhas, mel de cacau e tabaco suave.',
+      ingredientes: 'Massa de cacau, açúcar demerara orgânico, manteiga de cacau.',
+      alergicos: 'ALÉRGICOS: PODE CONTER LEITE, AVELÃ, AMÊNDOA E SOJA.',
+      gluten: 'NÃO CONTÉM GLÚTEN.',
+      alcool: false,
+      nota: 4.8,
+      avaliacoes: 87,
+      destaque: false,
+    },
+    {
+      id: 'tablete-gran-reserva-85',
+      nome: 'Tablete Gran Reserva 85% Sem Açúcar Adicionado',
+      categoria: 'Barras',
+      colecoes: ['veganos', 'exclusivas'],
+      selo: 'Safra Especial',
+      img: 'img/inicio/barra-artesanal.jpg',
+      alt: 'Tablete de chocolate escuro com padrões geométricos gravados, em envelope de papel acobreado e nibs de cacau ao lado.',
+      preco: 42,
+      unidade: 'Tablete 100 g',
+      teor: '85% cacau',
+      intensidades: ['dark'],
+      dietas: ['vegano', 'sem-lactose', 'sem-gluten', 'zero-acucar'],
+      resumo: 'Maturação lenta de 60 dias, toque defumado e flor de sal. Adoçado com eritritol.',
+      descricao:
+        'Chocolate 85% maturado por 60 dias, com toque defumado e flor de sal artesanal. Sem açúcar adicionado: adoçado com eritritol e estévia.',
+      ingredientes: 'Massa de cacau, manteiga de cacau, eritritol, flor de sal, edulcorante glicosídeos de esteviol.',
+      alergicos: 'ALÉRGICOS: PODE CONTER LEITE, AVELÃ E AMÊNDOA.',
+      gluten: 'NÃO CONTÉM GLÚTEN.',
+      alcool: false,
+      nota: 4.8,
+      avaliacoes: 62,
+      destaque: true,
+    },
+    {
+      id: 'bombons-licor-frutas',
+      nome: 'Caixa Bombons Licor e Frutas Silvestres',
+      categoria: 'Caixas',
+      colecoes: ['presentes'],
+      selo: 'Contém álcool',
+      img: 'img/catalogo/bombons-licor-frutas.jpg',
+      alt: 'Bombons vermelhos e escuros com cobertura espelhada sobre mármore, guarnecidos com amoras e framboesas.',
+      preco: 48,
+      unidade: 'Caixa 160 g • 8 unidades',
+      teor: 'Meio amargo 60% cacau',
+      intensidades: ['intenso'],
+      dietas: ['sem-gluten'],
+      resumo: 'Redução de mirtilo, cassis e toque de conhaque francês em casca meio amarga.',
+      descricao:
+        'Bombons recheados com redução de mirtilo e cassis e infusão de conhaque francês, em casca de chocolate 60%. Venda proibida para menores de 18 anos.',
+      ingredientes:
+        'Chocolate meio amargo (massa de cacau, açúcar, manteiga de cacau, emulsificante lecitina de soja), polpa de mirtilo, cassis, açúcar, creme de leite, conhaque (4% de teor alcoólico no recheio).',
+      alergicos: 'ALÉRGICOS: CONTÉM LEITE E DERIVADOS E SOJA. PODE CONTER AVELÃ E AMÊNDOA.',
+      gluten: 'NÃO CONTÉM GLÚTEN.',
+      alcool: true,
+      nota: 4.7,
+      avaliacoes: 58,
+      destaque: false,
+    },
+    {
+      id: 'kit-fondue',
+      nome: 'Kit Fondue Artesanal com Panelinha de Cerâmica',
+      categoria: 'Kits',
+      colecoes: ['presentes', 'exclusivas'],
+      selo: 'Experiência em Casa',
+      img: 'img/catalogo/kit-fondue.jpg',
+      alt: 'Panelinha de cerâmica para fondue com vela acesa e chocolate derretido escorrendo de um morango no garfo.',
+      preco: 89.9,
+      unidade: 'Kit completo • 250 g de chocolate',
+      teor: 'Blend 45% cacau',
+      intensidades: ['leite'],
+      dietas: ['sem-gluten'],
+      resumo:
+        'Panelinha terracota exclusiva, 250 g de chocolate em pastilhas e 2 garfinhos de bambu.',
+      descricao:
+        'Tudo para um fondue em casa: panelinha de terracota esmaltada exclusiva, suporte com vela, 250 g de chocolate 45% em pastilhas cremosas e 2 garfinhos de bambu. Edição limitada de inverno.',
+      ingredientes:
+        'Chocolate ao leite 45% (massa de cacau, açúcar, leite integral em pó, manteiga de cacau, emulsificante lecitina de soja). Acessórios: panelinha de cerâmica, vela, garfos de bambu.',
+      alergicos: 'ALÉRGICOS: CONTÉM LEITE E DERIVADOS E SOJA. PODE CONTER AVELÃ E AMÊNDOA.',
+      gluten: 'NÃO CONTÉM GLÚTEN.',
+      alcool: false,
+      nota: 4.9,
+      avaliacoes: 143,
+      destaque: false,
+    },
+  ],
+
+  // Filtros do catálogo.
+  intensidades: [
+    { id: 'leite', nome: 'Ao leite 35–45%' },
+    { id: 'intenso', nome: 'Intenso 55–75%' },
+    { id: 'dark', nome: 'Dark 80–90%' },
+  ],
+  dietas: [
+    { id: 'vegano', nome: '100% Vegano' },
+    { id: 'sem-gluten', nome: 'Sem Glúten' },
+    { id: 'sem-lactose', nome: 'Sem Lactose' },
+    { id: 'zero-acucar', nome: 'Sem Açúcar Adicionado' },
+  ],
+  colecoes: [
+    { id: 'exclusivas', nome: 'Coleções Exclusivas', icone: 'stars' },
+    { id: 'mais-vendidos', nome: 'Mais Vendidos', icone: 'local_fire_department' },
+    { id: 'presentes', nome: 'Presentes Finos', icone: 'redeem' },
+    { id: 'trufas', nome: 'Trufas Nobres', icone: 'cookie' },
+    { id: 'veganos', nome: 'Veganos & Zero', icone: 'spa' },
+  ],
+
+  // Passaporte: níveis definidos pelos Grãos acumulados (histórico total).
+  niveis: [
+    {
+      id: 'bronze',
+      nome: 'Cacau Bronze',
+      min: 0,
+      icone: 'military_tech',
+      faixa: '0 a 299 Grãos',
+      destaque: 'Acesso ao catálogo sensorial digital',
+      descricao:
+        'O primeiro contato com nosso universo. Trufa artesanal de boas-vindas na primeira compra e acúmulo integral de Grãos Dourados para trocas futuras.',
+    },
+    {
+      id: 'prata',
+      nome: 'Cacau Prata',
+      min: 300,
+      icone: 'workspace_premium',
+      faixa: '300 a 799 Grãos',
+      destaque: '1 Degustação Guiada por ano',
+      descricao:
+        'Para os verdadeiros apreciadores. Frete cortesia em 1 compra por mês, mimo no mês do seu aniversário e acesso prioritário aos lançamentos sazonais.',
+    },
+    {
+      id: 'ouro',
+      nome: 'Cacau Ouro',
+      min: 800,
+      icone: 'stars',
+      faixa: '800 a 1.999 Grãos',
+      destaque: 'Frete grátis e embalagem presente cortesia',
+      descricao:
+        'Experiências elevadas. Frete grátis em todos os pedidos, embalagem para presente cortesia, convite para a Harmonização Café & Cacau e atendimento por concierge chocolatier.',
+    },
+    {
+      id: 'diamante',
+      nome: 'Cacau Diamante',
+      min: 2000,
+      icone: 'diamond',
+      faixa: '2.000+ Grãos',
+      destaque: 'Workshop privado no Ateliê',
+      descricao:
+        'O ápice do requinte Santo Cacau. Todos os benefícios Ouro, Masterclass anual de Chocolatier com nossos chefs e degustação às cegas de colheitas raras.',
+    },
+  ],
+
+  recompensas: [
+    {
+      id: 'trufa-cortesia',
+      nome: 'Trufa Belga Cortesia',
+      graos: 150,
+      img: 'img/carrinho/trufas-belgas.jpg',
+      alt: 'Duas trufas de chocolate polvilhadas com cacau e cristais de flor de sal.',
+      descricao: 'Uma trufa de caramelo salgado para retirar em qualquer boutique.',
+    },
+    {
+      id: 'caixa-6-bombons',
+      nome: 'Caixa 6 Bombons Nobres',
+      graos: 600,
+      img: 'img/dashboard/caixa-bombons.jpg',
+      alt: 'Caixa artesanal aberta com seis bombons de praliné, avelã e caramelo.',
+      descricao: 'Seleção exclusiva de pralinés e ganaches premiadas.',
+    },
+    {
+      id: 'degustacao-boutique',
+      nome: 'Degustação Guiada na Boutique',
+      graos: 800,
+      img: 'img/dashboard/degustacao-boutique.jpg',
+      alt: 'Mesa de degustação com taças de cristal, nibs de cacau e amostras de chocolates finos.',
+      descricao: 'Sessão sensorial de 45 minutos com nosso sommelier de cacau.',
+    },
+  ],
+
+  experiencias: [
+    {
+      id: 'degustacao-origens',
+      nome: 'Degustação das Origens',
+      duracao: '45 min',
+      img: 'img/passaporte/degustacao-guiada.jpg',
+      alt: 'Quatro bombons de origem única sobre travessa de cerâmica escura com nibs de cacau.',
+      descricao:
+        'Viagem pelas safras de cacau de Ilhéus, Bahia e Pará com análise sensorial guiada.',
+      publico: 'Níveis Prata, Ouro e Diamante',
+      nivelMin: 'prata',
+      graos: 0,
+    },
+    {
+      id: 'harmonizacao-cafe',
+      nome: 'Harmonização Café & Cacau',
+      duracao: '60 min',
+      img: 'img/passaporte/harmonizacao-cafe-cacau.jpg',
+      alt: 'Xícara de espresso ao lado de pedaços de chocolate 70% recheados com praliné.',
+      descricao: 'Microlotes de cafés especiais combinados com pralinés e ganaches artesanais.',
+      publico: 'Exclusivo Ouro e Diamante',
+      nivelMin: 'ouro',
+      graos: 0,
+    },
+    {
+      id: 'atelie-trufas',
+      nome: 'Ateliê: Confecção de Trufas',
+      duracao: '90 min',
+      img: 'img/passaporte/workshop-trufas.jpg',
+      alt: 'Mãos de chocolatier enrolando trufas em cacau em pó sobre bancada de mármore.',
+      descricao: 'Aprenda a temperar chocolate e finalize sua própria caixa de doces nobres.',
+      publico: 'Todos os níveis (resgate com Grãos)',
+      nivelMin: 'bronze',
+      graos: 300,
+    },
+  ],
+
+  boutiques: [
+    {
+      id: 'jardins',
+      nome: 'Boutique Jardins',
+      endereco: 'Al. Lorena, 1420 — Jardins, São Paulo/SP',
+      horario: 'Seg. a sáb. 10h–20h • Dom. 12h–18h',
+      acessibilidade:
+        'Entrada sem degraus, banheiro adaptado, cardápio em braille e atendimento em Libras às sextas-feiras.',
+      mapa: 'https://www.google.com/maps/search/?api=1&query=Al.+Lorena,+1420,+Sao+Paulo',
+    },
+    {
+      id: 'campos',
+      nome: 'Boutique Campos do Jordão',
+      endereco: 'Av. Macedo Soares, 333 — Capivari, Campos do Jordão/SP',
+      horario: 'Todos os dias 10h–21h',
+      acessibilidade: 'Rampa de acesso, vaga reservada em frente e cardápio com QR Code em áudio.',
+      mapa: 'https://www.google.com/maps/search/?api=1&query=Av.+Macedo+Soares,+333,+Campos+do+Jordao',
+    },
+    {
+      id: 'curitiba',
+      nome: 'Boutique Curitiba',
+      endereco: 'R. Comendador Araújo, 500 — Batel, Curitiba/PR',
+      horario: 'Seg. a sáb. 10h–20h',
+      acessibilidade: 'Acesso por elevador, piso tátil e balcão de atendimento rebaixado.',
+      mapa: 'https://www.google.com/maps/search/?api=1&query=R.+Comendador+Araujo,+500,+Curitiba',
+    },
+  ],
+
+  cupons: {
+    DEGUSTA15: { tipo: 'valor', valor: 15, minimo: 100, descricao: 'R$ 15 de desconto em compras acima de R$ 100' },
+    BEMVINDO10: { tipo: 'percentual', valor: 10, minimo: 0, descricao: '10% de desconto na primeira compra', primeiraCompra: true },
+  },
+
+  // Regras comerciais.
+  regras: {
+    embalagemPresente: 3, // R$ por item
+    graosPorReal: 1,
+    resgateGraos: { graos: 200, desconto: 15 },
+    bonusCadastro: 100,
+    parcelasSemJuros: 3,
+    parcelaMinima: 30,
+    frete: {
+      expressa: { nome: 'Entrega Expressa Térmica', prazo: 'Hoje até 20h (pedidos até 14h)', valor: 14.9, gratisAcima: 150, apenasCapitalSP: true },
+      padrao: { nome: 'Entrega Padrão Refrigerada', prazo: '3 a 6 dias úteis', valor: 24.9, gratisAcima: 250 },
+      retirada: { nome: 'Retirar na Boutique Jardins', prazo: 'Pronto em até 2 horas', valor: 0 },
+    },
+  },
+};

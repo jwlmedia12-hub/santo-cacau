@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#fdf9f3" />
+    <meta name="description" content="Recursos de acessibilidade do site e das boutiques Santo Cacau e como pedir ajuda." />
+    <title>Declaração de Acessibilidade — Santo Cacau</title>
+    <link rel="icon" href="../img/logo.png" />
+    <link rel="manifest" href="../manifest.webmanifest" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@600;700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=block" />
+    <link rel="stylesheet" href="../css/styles.css" />
+    <script src="../js/theme.js"></script>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script src="../js/tailwind.config.js"></script>
+    <script src="../js/empresa.js" defer></script>
+    <script src="../js/data.js" defer></script>
+    <script src="../js/router.js" defer></script>
+    <script src="../js/store.js" defer></script>
+    <script src="../js/layout.js" defer></script>
+    <script src="../js/a11y.js" defer></script>
+    <script src="../js/consent.js" defer></script>
+    <script src="../js/pages/legal.js" defer></script>
+  </head>
+  <body data-route="acessibilidade">
+    <main id="conteudo">
+      <div class="container-estreito max-w-3xl flex flex-col gap-6 pt-2">
+        <header class="flex flex-col gap-2">
+          <p class="text-label-sm text-secondary uppercase tracking-widest">Inclusão</p>
+          <h1 class="font-titulo text-headline-xl">Declaração de Acessibilidade</h1>
+          <p class="text-body-sm text-on-surface-variant">Última revisão: <span data-empresa="atualizacaoPoliticas"></span></p>
+          <div id="acoes-pagina" class="flex flex-wrap gap-2"></div>
+        </header>
+
+        <div class="card rounded-xl bg-cacau text-on-cacau p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+          <span class="w-12 h-12 rounded-full bg-ouro text-on-ouro flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined">accessibility_new</span>
+          </span>
+          <p class="flex-1 text-body-md">
+            Todas as pessoas devem conseguir conhecer, escolher e comprar nossos chocolates com autonomia. Ajuste o site do
+            seu jeito no painel de acessibilidade.
+          </p>
+          <button type="button" data-abrir-a11y class="btn tap px-5 rounded-full bg-ouro text-on-ouro text-label-lg">Abrir painel</button>
+        </div>
+
+        <div id="sumario"></div>
+
+        <article class="prose-legal">
+          <h2>Nosso compromisso</h2>
+          <p>
+            Seguimos a Lei Brasileira de Inclusão da Pessoa com Deficiência (Lei nº 13.146/2015, art. 63), as Diretrizes de
+            Acessibilidade para Conteúdo Web (WCAG 2.2, nível AA) e o Modelo de Acessibilidade em Governo Eletrônico (eMAG)
+            como referência de boas práticas.
+          </p>
+
+          <h2>Recursos do site e do aplicativo</h2>
+          <ul>
+            <li><strong>Tradutor de Libras (VLibras):</strong> intérprete virtual do Governo Federal que traduz textos do site para a Língua Brasileira de Sinais.</li>
+            <li><strong>Leitura em voz alta:</strong> ouve o conteúdo principal da página ou apenas o trecho selecionado.</li>
+            <li><strong>Tamanho do texto:</strong> cinco níveis, até 175%, sem quebrar o layout. O zoom do navegador e do celular também funciona.</li>
+            <li><strong>Alto contraste:</strong> versões claro (preto sobre branco) e escuro (amarelo e branco sobre preto).</li>
+            <li><strong>Fonte de leitura facilitada:</strong> Atkinson Hyperlegible, criada para pessoas com baixa visão, que também ajuda pessoas com dislexia.</li>
+            <li><strong>Espaçamento ampliado, destaque de links, guia de leitura e cursor ampliado.</strong></li>
+            <li><strong>Pausar animações:</strong> ativado automaticamente se o seu aparelho pede movimento reduzido.</li>
+            <li><strong>Leitores de tela:</strong> estrutura com títulos, regiões e listas; imagens com descrição; ícones ocultos da leitura; avisos falados quando algo muda (como itens adicionados à sacola).</li>
+            <li><strong>Formulários:</strong> rótulos visíveis, mensagens de erro em texto ligadas a cada campo, preenchimento automático e máscaras que não bloqueiam a digitação.</li>
+            <li><strong>Toque:</strong> botões com área mínima de 44 × 44 pixels.</li>
+            <li><strong>Cor não é a única informação:</strong> filtros selecionados exibem ícone de confirmação, e etapas do pedido têm texto.</li>
+            <li><strong>Aplicativo:</strong> respeita o tamanho de fonte configurado no sistema Android e iOS e funciona com TalkBack e VoiceOver.</li>
+          </ul>
+
+          <h2>Atalhos de teclado</h2>
+          <table>
+            <caption class="sr-only">Atalhos de teclado disponíveis</caption>
+            <thead><tr><th scope="col">Teclas</th><th scope="col">Ação</th></tr></thead>
+            <tbody>
+              <tr><td><kbd>Alt</kbd> + <kbd>1</kbd></td><td>Ir para o conteúdo principal</td></tr>
+              <tr><td><kbd>Alt</kbd> + <kbd>2</kbd></td><td>Ir para o menu</td></tr>
+              <tr><td><kbd>Alt</kbd> + <kbd>3</kbd></td><td>Ir para a busca</td></tr>
+              <tr><td><kbd>Alt</kbd> + <kbd>4</kbd></td><td>Ir para o rodapé</td></tr>
+              <tr><td><kbd>Tab</kbd> / <kbd>Shift</kbd> + <kbd>Tab</kbd></td><td>Avançar / voltar entre links, botões e campos</td></tr>
+              <tr><td>Setas</td><td>Trocar entre abas e opções de um grupo</td></tr>
+              <tr><td><kbd>Esc</kbd></td><td>Fechar janelas</td></tr>
+            </tbody>
+          </table>
+          <p>No Firefox, use <kbd>Alt</kbd> + <kbd>Shift</kbd> + número. No Mac, <kbd>Control</kbd> + <kbd>Option</kbd> + número.</p>
+
+          <h2>Compatibilidade</h2>
+          <p>O site foi desenvolvido para funcionar com:</p>
+          <ul>
+            <li>NVDA e JAWS (Windows), VoiceOver (macOS e iOS) e TalkBack (Android);</li>
+            <li>navegação apenas por teclado;</li>
+            <li>zoom de 200% e tamanho de fonte do sistema ampliado.</li>
+          </ul>
+
+          <h2>Limitações conhecidas</h2>
+          <ul>
+            <li>O VLibras e a leitura em voz alta dependem de serviços do navegador e da internet; em alguns aparelhos a voz em português precisa ser instalada nas configurações.</li>
+            <li>O QR Code do Passaporte é acompanhado de um código em texto, que pode ser informado ao atendente.</li>
+            <li>Mapas das boutiques abrem em serviços externos, que têm acessibilidade própria. Os endereços também estão em texto.</li>
+          </ul>
+          <p>Estamos trabalhando continuamente para remover barreiras. Se encontrar alguma, conte para a gente.</p>
+
+          <h2>Acessibilidade nas boutiques</h2>
+          <ul>
+            <li>Entrada sem degraus ou com rampa, e balcão rebaixado.</li>
+            <li>Cardápio em braille e QR Code com descrição em áudio.</li>
+            <li>Atendimento em Libras na Boutique Jardins às sextas-feiras; em outros dias, avise com antecedência.</li>
+            <li>Ao agendar uma experiência, informe o recurso de que precisa (intérprete, cadeira de rodas, acompanhante).</li>
+          </ul>
+
+          <h2>Fale com a gente</h2>
+          <p>Escolha o canal mais confortável para você:</p>
+          <ul>
+            <li>WhatsApp (texto, áudio ou vídeo em Libras): <span data-empresa="whatsapp"></span></li>
+            <li>E-mail: <a data-empresa="email" data-empresa-link="mailto" href="#"></a></li>
+            <li>Telefone: <span data-empresa="telefone"></span> — <span data-empresa="horarioAtendimento"></span></li>
+            <li>Formulário na <a href="ajuda.html#contato">Central de ajuda</a> (assunto “Acessibilidade”).</li>
+          </ul>
+          <p>Respondemos relatos de barreiras de acessibilidade em até 2 dias úteis.</p>
+        </article>
+      </div>
+    </main>
+  </body>
+</html>
