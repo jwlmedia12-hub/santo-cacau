@@ -2,10 +2,10 @@ import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 
 // Endereço do site publicado (ex.: 'https://santocacau.com.br/').
-// Enquanto for null, o app usa o servidor local do site (npm run site).
+// Enquanto for null, o app usa o servidor local (npm run server, porta 3000).
 export const PRODUCTION_SITE_URL = null;
 
-export const SITE_PORT = 8080;
+export const SITE_PORT = 3000;
 
 export const COLORS = {
   surface: '#fdf9f3',

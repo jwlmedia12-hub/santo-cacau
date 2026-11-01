@@ -11,27 +11,100 @@
 > A partir dele, o projeto foi transformado em uma loja que funciona de ponta
 > a ponta, com catálogo, sacola, checkout, conta, programa de fidelidade,
 > políticas de privacidade e cookies (LGPD) e recursos de acessibilidade para
-> pessoas com deficiência. A marca, os dados da empresa e os produtos são
-> fictícios, e o pagamento é simulado.
+> pessoas com deficiência, além de um back-end próprio com banco de dados e
+> pagamento pelo Mercado Pago. A marca, os dados da empresa e os produtos são
+> fictícios.
 
-Loja completa em HTML + Tailwind (`www/`), exibida também como aplicativo
-Android/iOS por um app React Native (Expo) com WebView. O mesmo código serve o
-site, o app e a versão instalável (PWA).
+Loja completa em HTML + Tailwind (`www/`), com servidor Node.js (`server/`)
+e um app React Native (Expo) que exibe o site no Android/iOS. O mesmo código
+serve o site, o app e a versão instalável (PWA).
+
+## Dois modos de funcionamento
+
+| Modo              | Onde                                  | Conta, pedidos e Grãos         | Pagamento                       |
+| ----------------- | ------------------------------------- | ------------------------------ | ------------------------------- |
+| **Demonstração**  | GitHub Pages ou `npm run site`        | No navegador (`localStorage`)  | Simulado                        |
+| **Com servidor**  | `npm run server` ou hospedagem (Render) | Banco de dados SQLite        | Mercado Pago (ou simulado sem credenciais) |
+
+O modo é escolhido em `www/js/config.js` (`apiUrl`). O servidor entrega esse
+arquivo já configurado, então quem abre o site pelo servidor usa a API
+automaticamente.
 
 ## Comandos
 
-| Comando           | O que faz                                              |
-| ----------------- | ------------------------------------------------------ |
-| `npm install`     | Instala as dependências                                |
-| `npm start`       | Site (porta 8080) + Expo (QR code para o Expo Go)      |
-| `npm run web`     | Site + app no navegador                                |
-| `npm run android` | Site + app no emulador/celular Android                 |
-| `npm run site`    | Só o site em http://localhost:8080                     |
-| `npm run format`  | Formata HTML/CSS/JS com Prettier                       |
-| `npm run deploy:pages` | Atualiza o site no GitHub Pages (faça commit antes) |
+| Comando                | O que faz                                                   |
+| ---------------------- | ----------------------------------------------------------- |
+| `npm install`          | Instala as dependências                                     |
+| `npm run server`       | Servidor (API + site) em http://localhost:3000              |
+| `npm start`            | Servidor + Expo (QR code para o Expo Go)                    |
+| `npm run web`          | Servidor + app no navegador                                 |
+| `npm run android`      | Servidor + app no emulador/celular Android                  |
+| `npm run site`         | Só o site estático (modo demonstração) em http://localhost:8080 |
+| `npm run format`       | Formata HTML/CSS/JS com Prettier                            |
+| `npm run deploy:pages` | Atualiza o site no GitHub Pages (faça commit antes)         |
 
-No celular, use o **Expo Go** na mesma rede Wi-Fi do computador. Se o site não
-abrir, libere a porta 8080 no Firewall do Windows.
+Requer **Node.js 22.13 ou mais novo** (o banco SQLite já vem embutido). No
+celular, use o **Expo Go** na mesma rede Wi-Fi do computador; se não abrir,
+libere a porta 3000 no Firewall do Windows.
+
+## Back-end e pagamentos
+
+1. Copie `.env.example` para `.env`.
+2. Rode `npm run server`. Sem credenciais, o pagamento fica **simulado**: o
+   Pix mostra um botão "Simular pagamento aprovado" e o cartão é aprovado na
+   hora. Os e-mails (ex.: link de nova senha) aparecem no terminal.
+3. **Mercado Pago (teste):** crie uma aplicação em
+   https://www.mercadopago.com.br/developers/panel/app, copie o
+   **Access Token de teste** (começa com `TEST-`) para `MP_ACCESS_TOKEN` no
+   `.env` e reinicie. A partir daí:
+   - **Pix:** o QR Code real aparece na página do pedido, que se atualiza
+     sozinha quando o pagamento é confirmado.
+   - **Cartão:** o cliente é levado ao ambiente seguro do Mercado Pago
+     (Checkout Pro). Os dados do cartão nunca passam pelo nosso servidor.
+   - Use os [cartões de teste](https://www.mercadopago.com.br/developers/pt/docs/checkout-pro/additional-content/your-integrations/test/cards)
+     e um comprador de teste do painel.
+4. **Confirmação automática (webhook):** em produção, cadastre no painel do
+   Mercado Pago a URL `https://SEU-ENDERECO/api/webhooks/mercadopago` (evento
+   *Pagamentos*) e copie a assinatura secreta para `MP_WEBHOOK_SECRET`.
+   Localmente, sem endereço público, a página do pedido consulta o status a
+   cada 5 segundos.
+
+### O que o servidor garante
+
+- **Preços calculados no servidor** (`www/js/pricing.js` é o mesmo código no
+  site e no servidor): alterar valores pelo navegador não muda o que é cobrado.
+- **Grãos Dourados** creditados só com o pagamento aprovado, uma única vez; os
+  usados num pedido voltam se o pagamento for recusado ou expirar.
+- **Senhas** com `scrypt`; sessões por token com validade de 30 dias; link de
+  nova senha de uso único, válido por 1 hora, que encerra as outras sessões.
+- **Proteções:** limite de tentativas (login, cadastro, contato), CORS só para
+  os sites autorizados, validação de CPF, idade (18+), maioridade para
+  produtos com álcool e aceite dos termos.
+- **LGPD:** exportação dos dados (JSON) e exclusão da conta; pedidos ficam
+  guardados sem dados pessoais (exigência fiscal).
+
+### Estrutura do servidor (`server/`)
+
+| Arquivo        | Responsabilidade                                                  |
+| -------------- | ----------------------------------------------------------------- |
+| `index.js`     | Inicia o servidor                                                 |
+| `app.js`       | Rotas da API, segurança e site estático                           |
+| `servicos.js`  | Regras de negócio: contas, Grãos, pedidos, status e contato       |
+| `pagamento.js` | Mercado Pago (Pix, Checkout Pro, webhook) e modo simulado         |
+| `db.js`        | Banco SQLite (tabelas criadas automaticamente)                    |
+| `catalogo.js`  | Lê catálogo e regras de `www/js` (mesma fonte do site)            |
+| `email.js`     | E-mails por SMTP (ou no terminal, sem configuração)               |
+
+### Publicar o servidor (Render)
+
+O arquivo `render.yaml` publica tudo em um só endereço com HTTPS: em
+https://render.com, clique em **New › Blueprint**, escolha este repositório e
+preencha `PUBLIC_URL` e `MP_ACCESS_TOKEN`. O banco fica num disco persistente
+(exige plano pago). Depois, coloque o endereço do servidor em
+`PRODUCTION_SITE_URL` (`src/config.js`) para o app usar o servidor publicado.
+Se quiser que o site do GitHub Pages também use o servidor, ponha o mesmo
+endereço em `apiUrl` (`www/js/config.js`) e mantenha o GitHub Pages em
+`ALLOWED_ORIGINS`.
 
 ## Páginas
 
@@ -61,8 +134,12 @@ abrir, libere a porta 8080 no Firewall do Windows.
 | `tailwind.config.js` | Tema do Tailwind usando as variáveis de cor                           |
 | `empresa.js`         | **Dados da empresa: CNPJ, contatos, encarregado (DPO)**               |
 | `data.js`            | Produtos, filtros, níveis, recompensas, experiências, boutiques, regras de frete e cupons |
+| `config.js`          | Modo de funcionamento (demonstração ou servidor)                      |
 | `router.js`          | Mapa de rotas e utilitários de URL                                    |
-| `store.js`           | Sacola, conta, pedidos, preços, Grãos e CEP                           |
+| `pricing.js`         | Regras de preço, frete, cupons e níveis (também usado pelo servidor)  |
+| `backend-local.js`   | Back-end de demonstração (`localStorage`)                             |
+| `backend-api.js`     | Back-end real: chamadas à API do servidor                             |
+| `store.js`           | Sacola, conta, pedidos e CEP; escolhe o back-end conforme `config.js` |
 | `layout.js`          | Cabeçalho, menus, rodapé, avisos e componentes compartilhados        |
 | `a11y.js`            | Painel de acessibilidade                                              |
 | `consent.js`         | Consentimento de cookies (LGPD)                                       |
@@ -104,15 +181,9 @@ por `layout.js`.
 2. **Revise as políticas com um advogado.** Os textos seguem LGPD, CDC e
    Marco Civil, mas regras comerciais (validade dos Grãos, prazos, cupons)
    precisam refletir a operação real.
-3. **Back-end real.** Hoje conta, pedidos e Grãos ficam no `localStorage`
-   do aparelho (bom para demonstração). Para vender de verdade, troque as
-   funções de `store.js` por chamadas a uma API com banco de dados, envio de
-   e-mail e um gateway de pagamento (Mercado Pago, Pagar.me, Stripe…). Os
-   campos de cartão do checkout devem virar o formulário seguro do gateway.
-4. **Formulário de contato.** Abre o e-mail do visitante já preenchido; para
-   receber direto, ligue-o a uma API.
-5. **Tailwind em produção.** O CDN é ótimo para protótipo; para performance,
+3. **Pagamento em produção.** Teste tudo com as credenciais `TEST-`. Só troque
+   pelo Access Token de produção depois de homologar a conta no Mercado Pago,
+   configurar o webhook com `MP_WEBHOOK_SECRET` e o SMTP para os e-mails.
+4. **Tailwind em produção.** O CDN é ótimo para protótipo; para performance,
    gere o CSS com o Tailwind CLI.
-6. Publique a pasta `www/` em hospedagem com HTTPS e coloque o endereço em
-   `PRODUCTION_SITE_URL` (`src/config.js`). O service worker (`www/sw.js`) só
-   é ativado em produção; ao atualizar o site, aumente `VERSAO` nele.
+5. **Backup do banco.** Copie o arquivo de `DB_PATH` regularmente.

@@ -111,12 +111,67 @@
       e.preventDefault();
       var email = $('rec-email');
       if (!ui.form.validate(form, [[email, !util.validEmail(email.value) ? 'Informe um e-mail válido.' : null]])) return;
-      // Mensagem neutra: não revela se o e-mail está cadastrado.
-      $('rec-status').textContent =
-        'Se houver uma conta com ' + email.value.trim() + ', você receberá o link em alguns minutos. Confira também a caixa de spam.';
+      var enviar = form.querySelector('button:not([data-fechar])');
+      enviar.disabled = true;
+      SC.auth.recuperarSenha(email.value.trim()).then(
+        function () {
+          // Mensagem neutra: não revela se o e-mail está cadastrado.
+          $('rec-status').textContent =
+            SC.modo === 'api'
+              ? 'Se houver uma conta com ' + email.value.trim() + ', você receberá o link em alguns minutos. Confira também a caixa de spam.'
+              : 'Na versão de demonstração não enviamos e-mails. Crie uma conta nova ou fale com o atendimento.';
+        },
+        function (err) {
+          enviar.disabled = false;
+          $('rec-status').textContent = err.message;
+        }
+      );
     });
     dialog.showModal();
   });
+
+  /* ---------- Nova senha (link recebido por e-mail) ---------- */
+
+  var codigoRedefinir = SC.param('redefinir');
+  if (codigoRedefinir) {
+    var dlg = document.createElement('dialog');
+    dlg.setAttribute('aria-labelledby', 'nova-titulo');
+    dlg.innerHTML =
+      '<form novalidate class="p-6 flex flex-col gap-4">' +
+      '<h2 id="nova-titulo" class="font-titulo text-headline-md">Crie uma nova senha</h2>' +
+      '<div><label for="nova-senha" class="block text-label-lg mb-1">Nova senha</label>' +
+      '<input id="nova-senha" type="password" autocomplete="new-password" class="campo" aria-describedby="nova-dica" />' +
+      '<p id="nova-dica" class="text-body-sm text-on-surface-variant mt-1">Mínimo de 8 caracteres, com letras e números.</p></div>' +
+      '<p id="nova-status" role="status" class="text-body-md"></p>' +
+      '<div class="flex gap-2 justify-end"><button type="button" data-fechar class="btn tap px-5 rounded-full bg-surface-container-high">Cancelar</button>' +
+      '<button class="btn tap px-5 rounded-full bg-primary text-on-primary text-label-lg">Salvar senha</button></div></form>';
+    document.body.appendChild(dlg);
+    var formNova = dlg.querySelector('form');
+    dlg.querySelector('[data-fechar]').addEventListener('click', function () {
+      dlg.close();
+    });
+    dlg.addEventListener('close', function () {
+      dlg.remove();
+      history.replaceState(null, '', location.pathname);
+    });
+    formNova.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var nova = $('nova-senha');
+      var forte = regras.tamanho(nova.value) && regras.letra(nova.value) && regras.numero(nova.value);
+      if (!ui.form.validate(formNova, [[nova, !forte ? 'A senha precisa de 8 caracteres, com letras e números.' : null]])) return;
+      SC.auth.redefinirSenha(codigoRedefinir, nova.value).then(
+        function () {
+          dlg.close();
+          ui.toast('Senha alterada! Entre com a nova senha.');
+          $('login-id').focus();
+        },
+        function (err) {
+          $('nova-status').textContent = err.message;
+        }
+      );
+    });
+    dlg.showModal();
+  }
 
   /* ---------- Criar conta ---------- */
 

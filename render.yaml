@@ -1,0 +1,27 @@
+# Hospedagem no Render (https://render.com) — "New > Blueprint" e escolha este repositório.
+# Publica o servidor (API + site) em um só endereço, com HTTPS.
+services:
+  - type: web
+    name: santo-cacau
+    runtime: node
+    plan: starter # o disco persistente (banco de dados) exige plano pago
+    buildCommand: npm install --omit=dev --ignore-scripts
+    startCommand: node server/index.js
+    healthCheckPath: /api/saude
+    envVars:
+      - key: NODE_VERSION
+        value: 24
+      - key: DB_PATH
+        value: /var/data/santo-cacau.db
+      - key: PUBLIC_URL
+        sync: false # ex.: https://santo-cacau.onrender.com
+      - key: MP_ACCESS_TOKEN
+        sync: false # credencial do Mercado Pago (comece pela de TESTE)
+      - key: MP_WEBHOOK_SECRET
+        sync: false
+      - key: ALLOWED_ORIGINS
+        value: https://jwlmedia12-hub.github.io
+    disk:
+      name: dados
+      mountPath: /var/data
+      sizeGB: 1

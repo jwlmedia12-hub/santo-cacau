@@ -1,6 +1,6 @@
 // Central de ajuda: links dos canais e formulário de contato.
-// Sem servidor, a mensagem é aberta no aplicativo de e-mail do visitante já
-// preenchida (mailto). Para receber direto, ligue o formulário a uma API.
+// Com servidor, a mensagem é gravada e a equipe é avisada; na demonstração,
+// abre o aplicativo de e-mail do visitante com a mensagem pronta (mailto).
 (function () {
   var SC = window.SantoCacau;
   var E = window.SC_EMPRESA;
@@ -38,33 +38,55 @@
       [$('ct-mensagem'), $('ct-mensagem').value.trim().length < 10 ? 'Escreva sua mensagem (mínimo de 10 caracteres).' : null],
     ]);
     if (!ok) return;
-
-    var protocolo = 'AT' + String(Date.now()).slice(-8);
     var canal = form.querySelector('input[name="ct-canal"]:checked').value;
-    var corpo =
-      'Protocolo: ' + protocolo + '\n' +
-      'Nome: ' + $('ct-nome').value.trim() + '\n' +
-      'E-mail: ' + $('ct-email').value.trim() + '\n' +
-      'Pedido: ' + ($('ct-pedido').value.trim() || '-') + '\n' +
-      'Resposta preferida: ' + canal + '\n\n' +
-      $('ct-mensagem').value.trim();
-    var mailto =
-      'mailto:' + ($('ct-assunto').value.indexOf('LGPD') !== -1 ? E.encarregadoEmail : E.email) +
-      '?subject=' + encodeURIComponent('[' + protocolo + '] ' + $('ct-assunto').value) +
-      '&body=' + encodeURIComponent(corpo);
+    var dados = {
+      nome: $('ct-nome').value.trim(),
+      email: $('ct-email').value.trim(),
+      assunto: $('ct-assunto').value,
+      pedido: $('ct-pedido').value.trim(),
+      mensagem: $('ct-mensagem').value.trim(),
+      canal: canal,
+    };
+    var botao = form.querySelector('button');
+    botao.disabled = true;
 
-    var msgs = SC.storage.get('mensagens', []);
-    msgs.unshift({ protocolo: protocolo, data: new Date().toISOString(), assunto: $('ct-assunto').value });
-    SC.storage.set('mensagens', msgs.slice(0, 20));
-
-    var ok2 = $('contato-ok');
-    ok2.innerHTML =
-      '<h3 class="text-title-lg">Quase lá! Protocolo ' + protocolo + '</h3>' +
-      '<p class="text-body-md">Abrimos seu aplicativo de e-mail com a mensagem pronta — é só tocar em enviar. Se ele não abrir, ' +
-      '<a class="underline font-semibold" href="' + mailto + '">toque aqui para abrir o e-mail</a> ou fale pelo WhatsApp ' + util.esc(E.whatsapp) + ' informando o protocolo.</p>';
-    ok2.hidden = false;
-    ok2.focus();
-    window.location.href = mailto;
+    SC.contato.enviar(dados).then(
+      function (res) {
+        botao.disabled = false;
+        var ok2 = $('contato-ok');
+        if (res.enviado) {
+          // Com servidor: mensagem registrada e equipe avisada.
+          ok2.innerHTML =
+            '<h3 class="text-title-lg">Mensagem enviada! Protocolo ' + util.esc(res.protocolo) + '</h3>' +
+            '<p class="text-body-md">Recebemos sua mensagem e vamos responder por ' + util.esc(canal.toLowerCase()) + ' em até 2 dias úteis.</p>';
+          form.reset();
+        } else {
+          // Demonstração: abre o e-mail do visitante com a mensagem pronta.
+          var corpo =
+            'Protocolo: ' + res.protocolo + '\n' +
+            'Nome: ' + dados.nome + '\n' +
+            'E-mail: ' + dados.email + '\n' +
+            'Pedido: ' + (dados.pedido || '-') + '\n' +
+            'Resposta preferida: ' + canal + '\n\n' +
+            dados.mensagem;
+          var mailto =
+            'mailto:' + (dados.assunto.indexOf('LGPD') !== -1 ? E.encarregadoEmail : E.email) +
+            '?subject=' + encodeURIComponent('[' + res.protocolo + '] ' + dados.assunto) +
+            '&body=' + encodeURIComponent(corpo);
+          ok2.innerHTML =
+            '<h3 class="text-title-lg">Quase lá! Protocolo ' + util.esc(res.protocolo) + '</h3>' +
+            '<p class="text-body-md">Abrimos seu aplicativo de e-mail com a mensagem pronta — é só tocar em enviar. Se ele não abrir, ' +
+            '<a class="underline font-semibold" href="' + mailto + '">toque aqui para abrir o e-mail</a> ou fale pelo WhatsApp ' + util.esc(E.whatsapp) + ' informando o protocolo.</p>';
+          window.location.href = mailto;
+        }
+        ok2.hidden = false;
+        ok2.focus();
+      },
+      function (err) {
+        botao.disabled = false;
+        ui.toast(err.message, 'erro');
+      }
+    );
   });
 
   if (location.hash === '#contato') $('contato').focus();

@@ -164,24 +164,27 @@
       var data = document.getElementById('ag-data');
       var dia = data.value ? new Date(data.value + 'T12:00').getDay() : -1;
       if (!ui.form.validate(form, [[data, !data.value ? 'Escolha uma data.' : data.value < min ? 'Escolha a partir de amanhã.' : null]])) return;
-      var u = SC.auth.current();
       var boutique = DATA.boutiques.filter(function (b) { return b.id === document.getElementById('ag-boutique').value; })[0];
       var ag = {
-        id: util.id('A'),
-        experiencia: x.id,
-        nome: x.nome,
         boutique: boutique.nome,
         data: data.value,
         hora: document.getElementById('ag-hora').value,
         necessidades: document.getElementById('ag-necessidades').value.trim(),
-        graos: x.graos,
       };
-      SC.auth.update({ agendamentos: [ag].concat(u.agendamentos || []) });
-      if (x.graos) SC.auth.addGraos(-x.graos, 'Agendamento: ' + x.nome, 'event');
-      dialog.close();
-      renderExperiencias();
-      renderCta();
-      ui.toast('Agendado para ' + util.date(ag.data + 'T12:00') + ' às ' + ag.hora + (dia === 0 ? ' (domingo)' : '') + '. Veja em Minha conta.');
+      var botao = form.querySelector('button:not([data-fechar])');
+      botao.disabled = true;
+      SC.conta.agendar(x.id, ag).then(
+        function () {
+          dialog.close();
+          renderExperiencias();
+          renderCta();
+          ui.toast('Agendado para ' + util.date(ag.data + 'T12:00') + ' às ' + ag.hora + (dia === 0 ? ' (domingo)' : '') + '. Veja em Minha conta.');
+        },
+        function (err) {
+          botao.disabled = false;
+          ui.form.validate(form, [[data, err.message]]);
+        }
+      );
     });
     dialog.showModal();
   }
