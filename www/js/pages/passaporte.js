@@ -30,6 +30,7 @@
   var paineis = document.getElementById('niveis-paineis');
   var user = SC.auth.current();
   var atual = user ? SC.nivel(user.graosTotal).atual.id : 'bronze';
+  var nivelFiltro = atual;
 
   abas.innerHTML = DATA.niveis
     .map(function (n) {
@@ -65,6 +66,8 @@
       t.tabIndex = on ? 0 : -1;
       document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
     });
+    nivelFiltro = tab.id.replace('aba-', '');
+    renderExperiencias();
     if (foco) {
       tab.focus();
       tab.scrollIntoView({ block: 'nearest', inline: 'nearest' });
@@ -89,10 +92,24 @@
 
   /* ---------- Experiências ---------- */
 
+  // As abas de nível também filtram as experiências: mostra as que o nível
+  // escolhido já libera (nível mínimo igual ou abaixo dele).
+  var filtroCheck = document.getElementById('exp-filtrar');
+  filtroCheck.addEventListener('change', renderExperiencias);
+
   function renderExperiencias() {
     var u = SC.auth.current();
     var nivelUser = u ? SC.nivel(u.graosTotal).indice : -1;
-    document.getElementById('lista-experiencias').innerHTML = DATA.experiencias
+    var nivel = DATA.niveis[SC.nivelIndice(nivelFiltro)];
+    var filtrar = filtroCheck.checked;
+    var lista = DATA.experiencias.filter(function (x) {
+      return !filtrar || SC.nivelIndice(x.nivelMin) <= SC.nivelIndice(nivelFiltro);
+    });
+    var n = lista.length === 1 ? '1 experiência' : lista.length + ' experiências';
+    document.getElementById('exp-status').textContent = filtrar
+      ? n + ' para o nível ' + nivel.nome + '.'
+      : 'Mostrando todas: ' + n + '.';
+    document.getElementById('lista-experiencias').innerHTML = lista
       .map(function (x) {
         var nivelOk = u && nivelUser >= SC.nivelIndice(x.nivelMin);
         var saldoOk = u && u.graos >= x.graos;

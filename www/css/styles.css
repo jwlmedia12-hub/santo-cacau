@@ -110,6 +110,11 @@ main:focus-visible,
   box-shadow: none;
 }
 
+/* "hidden" sempre esconde, mesmo com classes como flex/grid do Tailwind. */
+[hidden] {
+  display: none !important;
+}
+
 /* Palavras longas (e-mails, endereços) quebram em vez de alargar a página. */
 body {
   overflow-wrap: break-word;
