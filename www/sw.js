@@ -1,9 +1,9 @@
 /**
  * Santo Cacau — service worker (só é registrado em produção, via HTTPS).
- * Páginas: rede primeiro, com cópia offline. Imagens, CSS e JS: cache primeiro.
- * Ao publicar uma nova versão, aumente VERSAO para limpar o cache antigo.
+ * Tudo é buscado primeiro na rede, para que cada atualização do site apareça
+ * logo; a cópia guardada só é usada sem internet.
  */
-var VERSAO = 'sc-v1';
+var VERSAO = 'sc-v2';
 var ESSENCIAIS = [
   './',
   './index.html',
@@ -25,56 +25,47 @@ self.addEventListener('install', function (event) {
 
 self.addEventListener('activate', function (event) {
   event.waitUntil(
-    caches.keys().then(function (keys) {
-      return Promise.all(
-        keys.filter(function (k) {
-          return k !== VERSAO;
-        }).map(function (k) {
-          return caches.delete(k);
-        })
-      );
-    })
+    caches
+      .keys()
+      .then(function (keys) {
+        return Promise.all(
+          keys
+            .filter(function (k) {
+              return k !== VERSAO;
+            })
+            .map(function (k) {
+              return caches.delete(k);
+            })
+        );
+      })
+      .then(function () {
+        return self.clients.claim();
+      })
   );
-  self.clients.claim();
 });
 
 self.addEventListener('fetch', function (event) {
   var req = event.request;
   if (req.method !== 'GET' || new URL(req.url).origin !== location.origin) return;
 
-  if (req.mode === 'navigate') {
-    event.respondWith(
-      fetch(req)
-        .then(function (res) {
+  // "no-cache" revalida com o servidor em vez de usar o cache HTTP do navegador.
+  var rede = req.mode === 'navigate' ? fetch(req) : fetch(new Request(req, { cache: 'no-cache' }));
+
+  event.respondWith(
+    rede
+      .then(function (res) {
+        if (res.ok) {
           var copy = res.clone();
           caches.open(VERSAO).then(function (c) {
             c.put(req, copy);
           });
-          return res;
-        })
-        .catch(function () {
-          return caches.match(req).then(function (hit) {
-            return hit || caches.match('./index.html');
-          });
-        })
-    );
-    return;
-  }
-
-  event.respondWith(
-    caches.match(req).then(function (hit) {
-      return (
-        hit ||
-        fetch(req).then(function (res) {
-          if (res.ok) {
-            var copy = res.clone();
-            caches.open(VERSAO).then(function (c) {
-              c.put(req, copy);
-            });
-          }
-          return res;
-        })
-      );
-    })
+        }
+        return res;
+      })
+      .catch(function () {
+        return caches.match(req).then(function (hit) {
+          return hit || (req.mode === 'navigate' ? caches.match('./index.html') : Response.error());
+        });
+      })
   );
 });

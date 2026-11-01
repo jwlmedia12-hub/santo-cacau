@@ -529,7 +529,20 @@
     var host = location.hostname;
     var local = host === 'localhost' || host === '127.0.0.1' || /^(10|192\.168|172\.(1[6-9]|2\d|3[01]))\./.test(host);
     if ('serviceWorker' in navigator && location.protocol === 'https:' && !local) {
-      navigator.serviceWorker.register(SC.asset('sw.js')).catch(function () {});
+      // Quando uma versão nova do site assume, recarrega uma vez para usá-la.
+      var tinhaVersao = !!navigator.serviceWorker.controller;
+      var recarregou = false;
+      navigator.serviceWorker.addEventListener('controllerchange', function () {
+        if (!tinhaVersao || recarregou) return;
+        recarregou = true;
+        location.reload();
+      });
+      navigator.serviceWorker
+        .register(SC.asset('sw.js'), { updateViaCache: 'none' })
+        .then(function (reg) {
+          reg.update();
+        })
+        .catch(function () {});
     }
   }
 
