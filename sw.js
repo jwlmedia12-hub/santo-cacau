@@ -3,7 +3,7 @@
  * Tudo é buscado primeiro na rede, para que cada atualização do site apareça
  * logo; a cópia guardada só é usada sem internet.
  */
-var VERSAO = 'sc-v2';
+var VERSAO = 'sc-v3';
 var ESSENCIAIS = [
   './',
   './index.html',
@@ -46,7 +46,10 @@ self.addEventListener('activate', function (event) {
 
 self.addEventListener('fetch', function (event) {
   var req = event.request;
-  if (req.method !== 'GET' || new URL(req.url).origin !== location.origin) return;
+  var url = new URL(req.url);
+  if (req.method !== 'GET' || url.origin !== location.origin) return;
+  // Dados da conta e pedidos nunca vão para o cache do aparelho.
+  if (url.pathname.indexOf('/api/') !== -1) return;
 
   // "no-cache" revalida com o servidor em vez de usar o cache HTTP do navegador.
   var rede = req.mode === 'navigate' ? fetch(req) : fetch(new Request(req, { cache: 'no-cache' }));

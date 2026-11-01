@@ -69,8 +69,25 @@
     );
   }
 
-  function pedidosHtml(u) {
-    var lista = SC.orders.list(u.id);
+  // Pedidos vêm do back-end (assíncrono); até chegarem, mostra "carregando".
+  var pedidosCache = null;
+  function carregarPedidos() {
+    return SC.orders.list().then(
+      function (lista) {
+        pedidosCache = lista;
+        render();
+      },
+      function (err) {
+        pedidosCache = { erro: err.message };
+        render();
+      }
+    );
+  }
+
+  function pedidosHtml() {
+    var lista = pedidosCache;
+    if (lista === null) return '<p class="text-body-md" role="status">Carregando pedidos…</p>';
+    if (lista.erro) return '<p class="text-body-md text-error" role="alert">' + esc(lista.erro) + '</p>';
     if (!lista.length) {
       return '<p class="card rounded-xl bg-surface-container-low p-4 text-body-md">Você ainda não fez pedidos. <a class="underline text-secondary font-semibold" href="' + SC.url('catalogo') + '">Conheça nossos chocolates</a>.</p>';
     }
@@ -228,7 +245,7 @@
       }).join('') +
       '</ul></nav></div>' +
       '<div class="flex flex-col gap-8">' +
-      card('pedidos', 'Meus pedidos', 'receipt_long', pedidosHtml(u)) +
+      card('pedidos', 'Meus pedidos', 'receipt_long', pedidosHtml()) +
       card('recompensas', 'Resgate de recompensas', 'award_star', recompensasHtml(u)) +
       card('agenda', 'Experiências agendadas', 'calendar_month', agendamentosHtml(u)) +
       card('extrato', 'Extrato de Grãos', 'history', extratoHtml(u)) +
@@ -242,7 +259,12 @@
   /* ---------- Ações ---------- */
 
   function baixarDados() {
-    var dados = SC.auth.exportData();
+    SC.auth.exportData().then(mostrarDados, function (err) {
+      ui.toast(err.message, 'erro');
+    });
+  }
+
+  function mostrarDados(dados) {
     var json = JSON.stringify(dados, null, 2);
     var dialog = document.createElement('dialog');
     dialog.setAttribute('aria-labelledby', 'exp-titulo');
@@ -337,14 +359,16 @@
       var rec = DATA.recompensas.filter(function (r) { return r.id === resgatar.getAttribute('data-resgatar'); })[0];
       ui.confirm({ titulo: 'Confirmar resgate', mensagem: 'Trocar ' + rec.graos + ' Grãos por ' + rec.nome + '?', confirmar: 'Resgatar' }).then(function (ok) {
         if (!ok) return;
-        var u = SC.auth.current();
-        if (u.graos < rec.graos) return ui.toast('Saldo insuficiente.', 'erro');
-        var codigo = 'R' + util.id().slice(-6);
-        SC.auth.update({ resgates: [{ id: rec.id, nome: rec.nome, data: new Date().toISOString(), codigo: codigo }].concat(u.resgates || []) });
-        SC.auth.addGraos(-rec.graos, 'Resgate: ' + rec.nome, 'redeem');
-        render();
-        ui.toast('Resgate confirmado! Código ' + codigo + '. Apresente na boutique.');
-        agendarFoco('recompensas');
+        SC.conta.resgatar(rec.id).then(
+          function (res) {
+            render();
+            ui.toast('Resgate confirmado! Código ' + res.codigo + '. Apresente na boutique.');
+            agendarFoco('recompensas');
+          },
+          function (err) {
+            ui.toast(err.message, 'erro');
+          }
+        );
       });
       return;
     }
@@ -352,36 +376,40 @@
     if (cancelar) {
       ui.confirm({ titulo: 'Cancelar agendamento?', mensagem: 'Os Grãos usados serão devolvidos ao seu saldo.', confirmar: 'Cancelar agendamento', cancelar: 'Manter', perigo: true }).then(function (ok) {
         if (!ok) return;
-        var u = SC.auth.current();
-        var id = cancelar.getAttribute('data-cancelar-agendamento');
-        var ag = u.agendamentos.filter(function (a) { return a.id === id; })[0];
-        SC.auth.update({ agendamentos: u.agendamentos.filter(function (a) { return a.id !== id; }) });
-        if (ag && ag.graos) SC.auth.addGraos(ag.graos, 'Estorno: ' + ag.nome, 'undo');
-        render();
-        ui.toast('Agendamento cancelado.');
-        agendarFoco('agenda');
+        SC.conta.cancelarAgendamento(cancelar.getAttribute('data-cancelar-agendamento')).then(
+          function () {
+            render();
+            ui.toast('Agendamento cancelado.');
+            agendarFoco('agenda');
+          },
+          function (err) {
+            ui.toast(err.message, 'erro');
+          }
+        );
       });
       return;
     }
     if (t.closest('#mkt-switch')) {
       var sw = t.closest('#mkt-switch');
       var on = sw.getAttribute('aria-checked') !== 'true';
-      var u2 = SC.auth.current();
-      var consent = u2.consentimentos || {};
-      consent.marketing = { aceito: on, data: new Date().toISOString() };
-      var prefs = u2.preferencias || { dietas: [] };
-      prefs.avisos = on;
-      SC.auth.update({ consentimentos: consent, preferencias: prefs });
-      render();
-      document.getElementById('mkt-switch').focus();
-      ui.toast(on ? 'Você vai receber nossas novidades.' : 'Consentimento revogado. Você não receberá mais ofertas.');
+      SC.conta.marketing(on).then(
+        function () {
+          render();
+          document.getElementById('mkt-switch').focus();
+          ui.toast(on ? 'Você vai receber nossas novidades.' : 'Consentimento revogado. Você não receberá mais ofertas.');
+        },
+        function (err) {
+          ui.toast(err.message, 'erro');
+        }
+      );
       return;
     }
     if (t.closest('#exportar')) return baixarDados();
     if (t.closest('#trocar-senha')) return trocarSenha();
     if (t.closest('#sair')) {
-      SC.auth.logout();
-      location.href = SC.url('inicio');
+      SC.auth.logout().then(function () {
+        location.href = SC.url('inicio');
+      });
       return;
     }
     if (t.closest('#excluir')) {
@@ -392,8 +420,14 @@
         perigo: true,
       }).then(function (ok) {
         if (!ok) return;
-        SC.auth.deleteAccount();
-        location.href = SC.url('inicio');
+        SC.auth.deleteAccount().then(
+          function () {
+            location.href = SC.url('inicio');
+          },
+          function (err) {
+            ui.toast(err.message, 'erro');
+          }
+        );
       });
     }
   });
@@ -409,13 +443,23 @@
       [tel, util.digits(tel.value).length < 10 ? 'Informe o celular com DDD.' : null],
     ]);
     if (!ok) return;
-    var u = SC.auth.current();
-    var prefs = u.preferencias || {};
-    prefs.dietas = Array.prototype.map.call(form.querySelectorAll('input[name="dieta"]:checked'), function (i) { return i.value; });
-    SC.auth.update({ nome: nome.value.trim(), telefone: util.digits(tel.value), preferencias: prefs });
-    ui.toast('Dados atualizados.');
+    var dietas = Array.prototype.map.call(form.querySelectorAll('input[name="dieta"]:checked'), function (i) { return i.value; });
+    SC.conta.atualizarPerfil({ nome: nome.value.trim(), telefone: util.digits(tel.value), dietas: dietas }).then(
+      function () {
+        ui.toast('Dados atualizados.');
+      },
+      function (err) {
+        ui.toast(err.message, 'erro');
+      }
+    );
   });
 
   render();
-  if (location.hash) agendarFoco(location.hash.slice(1));
+  carregarPedidos().then(function () {
+    if (location.hash) agendarFoco(location.hash.slice(1));
+  });
+  // Saldo confirmado pelo servidor ao abrir a página.
+  SC.events.on('auth', function () {
+    if (SC.auth.current() && !document.querySelector('dialog[open]')) render();
+  });
 })();

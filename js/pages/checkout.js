@@ -73,24 +73,35 @@
     parcelasOpts += '<option value="' + n + '">' + n + 'x de ' + util.money(r.total / n) + ' sem juros</option>';
   }
 
+  // Com servidor, os dados do cartão são digitados só no ambiente seguro do
+  // Mercado Pago; na demonstração, ficam neste formulário e não são enviados.
+  var comServidor = SC.modo === 'api';
+  var avisoPagamento = comServidor
+    ? '<p class="rounded-lg bg-surface-container-low p-3 text-body-sm flex items-start gap-2">' + icon('verified_user', 'shrink-0 text-secondary') +
+      '<span>Pagamento processado pelo <strong>Mercado Pago</strong>. No cartão, você digita os dados no ambiente seguro do Mercado Pago — eles não passam pela Santo Cacau.</span></p>'
+    : '<p class="rounded-lg bg-secondary-fixed text-on-secondary-fixed p-3 text-body-sm flex items-start gap-2">' + icon('info', 'shrink-0') +
+      '<span><strong>Ambiente de demonstração:</strong> nenhum valor é cobrado e os dados do cartão não são enviados nem guardados. Não use um cartão real.</span></p>';
+
   var pagamento =
-    '<p class="rounded-lg bg-secondary-fixed text-on-secondary-fixed p-3 text-body-sm flex items-start gap-2">' + icon('info', 'shrink-0') +
-    '<span><strong>Ambiente de demonstração:</strong> nenhum valor é cobrado e os dados do cartão não são enviados nem guardados. Não use um cartão real.</span></p>' +
+    avisoPagamento +
     '<fieldset class="flex flex-col gap-2"><legend class="text-label-lg mb-1">Forma de pagamento <span aria-hidden="true">*</span></legend>' +
     '<label for="pg-pix" class="flex items-start gap-3 p-3 rounded-lg border border-outline-variant has-[:checked]:border-2 has-[:checked]:border-primary cursor-pointer">' +
     '<input type="radio" id="pg-pix" name="metodo" value="pix" checked class="mt-0.5" />' +
     '<span><span class="block text-label-lg">Pix</span><span class="block text-body-sm text-on-surface-variant">Aprovação imediata. O código aparece após confirmar.</span></span></label>' +
     '<label for="pg-cartao" class="flex items-start gap-3 p-3 rounded-lg border border-outline-variant has-[:checked]:border-2 has-[:checked]:border-primary cursor-pointer">' +
     '<input type="radio" id="pg-cartao" name="metodo" value="cartao" class="mt-0.5" />' +
-    '<span><span class="block text-label-lg">Cartão de crédito</span><span class="block text-body-sm text-on-surface-variant">Em até ' + r.parcelas + 'x sem juros.</span></span></label>' +
+    '<span><span class="block text-label-lg">Cartão de crédito</span><span class="block text-body-sm text-on-surface-variant">Em até ' + r.parcelas + 'x sem juros.' +
+    (comServidor ? ' Você será levado ao Mercado Pago para concluir.' : '') + '</span></span></label>' +
     '</fieldset>' +
-    '<div id="dados-cartao" hidden class="grid gap-4 sm:grid-cols-6">' +
-    campo('cartao-numero', 'Número do cartão', 'inputmode="numeric" autocomplete="cc-number" placeholder="0000 0000 0000 0000"', { cls: 'sm:col-span-6' }) +
-    campo('cartao-nome', 'Nome impresso no cartão', 'autocomplete="cc-name"', { cls: 'sm:col-span-6' }) +
-    campo('cartao-validade', 'Validade (MM/AA)', 'inputmode="numeric" autocomplete="cc-exp" placeholder="MM/AA"', { cls: 'sm:col-span-3' }) +
-    campo('cartao-cvv', 'Código de segurança (CVV)', 'inputmode="numeric" autocomplete="cc-csc" maxlength="4"', { cls: 'sm:col-span-3', dica: '3 ou 4 números no verso do cartão.' }) +
-    '<div class="sm:col-span-6"><label for="parcelas" class="block text-label-lg mb-1">Parcelas</label><select id="parcelas" name="parcelas" class="campo">' + parcelasOpts + '</select></div>' +
-    '</div>';
+    (comServidor
+      ? ''
+      : '<div id="dados-cartao" hidden class="grid gap-4 sm:grid-cols-6">' +
+        campo('cartao-numero', 'Número do cartão', 'inputmode="numeric" autocomplete="cc-number" placeholder="0000 0000 0000 0000"', { cls: 'sm:col-span-6' }) +
+        campo('cartao-nome', 'Nome impresso no cartão', 'autocomplete="cc-name"', { cls: 'sm:col-span-6' }) +
+        campo('cartao-validade', 'Validade (MM/AA)', 'inputmode="numeric" autocomplete="cc-exp" placeholder="MM/AA"', { cls: 'sm:col-span-3' }) +
+        campo('cartao-cvv', 'Código de segurança (CVV)', 'inputmode="numeric" autocomplete="cc-csc" maxlength="4"', { cls: 'sm:col-span-3', dica: '3 ou 4 números no verso do cartão.' }) +
+        '<div class="sm:col-span-6"><label for="parcelas" class="block text-label-lg mb-1">Parcelas</label><select id="parcelas" name="parcelas" class="campo">' + parcelasOpts + '</select></div>' +
+        '</div>');
 
   var confirmacoes =
     '<div><label for="observacoes" class="block text-label-lg mb-1">Mensagem para o cartão de presente (opcional)</label>' +
@@ -140,8 +151,9 @@
 
   if ($('sair')) {
     $('sair').addEventListener('click', function () {
-      SC.auth.logout();
-      location.reload();
+      SC.auth.logout().then(function () {
+        location.reload();
+      });
     });
   }
 
@@ -170,8 +182,14 @@
   form.addEventListener('change', function (e) {
     if (e.target.name === 'metodo') {
       var cartao = e.target.value === 'cartao';
-      $('dados-cartao').hidden = !cartao;
-      SC.ui.announce(cartao ? 'Campos do cartão exibidos.' : 'Pagamento por Pix selecionado.');
+      if ($('dados-cartao')) $('dados-cartao').hidden = !cartao;
+      SC.ui.announce(
+        cartao
+          ? comServidor
+            ? 'Cartão selecionado. Ao confirmar, você será levado ao Mercado Pago.'
+            : 'Campos do cartão exibidos.'
+          : 'Pagamento por Pix selecionado.'
+      );
     }
   });
 
@@ -198,7 +216,7 @@
         checks.push([$('cep'), 'A entrega expressa atende apenas a capital de SP. Volte à sacola e escolha a entrega padrão.']);
       }
     }
-    if (metodo === 'cartao') {
+    if (metodo === 'cartao' && !comServidor) {
       var num = util.digits(v('cartao-numero'));
       var val = v('cartao-validade').split('/');
       var mes = Number(val[0]);
@@ -227,13 +245,43 @@
       : { cep: util.maskCEP(v('cep')), logradouro: v('logradouro'), numero: v('numero'), complemento: v('complemento'), bairro: v('bairro'), cidade: v('cidade'), uf: v('uf').toUpperCase() };
     var pagamentoInfo =
       metodo === 'cartao'
-        ? { metodo: 'cartao', final: util.digits(v('cartao-numero')).slice(-4), parcelas: Number(v('parcelas')) || 1 }
+        ? comServidor
+          ? { metodo: 'cartao' }
+          : { metodo: 'cartao', final: util.digits(v('cartao-numero')).slice(-4), parcelas: Number(v('parcelas')) || 1 }
         : { metodo: 'pix', parcelas: 1 };
 
-    // Guarda o endereço na conta para a próxima compra.
-    if (user && endereco) SC.auth.update({ enderecos: [endereco] });
+    var botao = form.querySelector('button[type="submit"]');
+    botao.disabled = true;
+    botao.setAttribute('aria-busy', 'true');
+    SC.ui.announce('Criando seu pedido…');
 
-    var order = SC.orders.create({ cliente: cliente, endereco: endereco, pagamento: pagamentoInfo, observacoes: v('observacoes') });
-    SC.navigate('pedido', { id: order.id, novo: 1 });
+    // Guarda o endereço na conta para a próxima compra.
+    var salvarEndereco = user && endereco ? SC.conta.atualizarPerfil({ endereco: endereco }).catch(function () {}) : Promise.resolve();
+
+    salvarEndereco
+      .then(function () {
+        return SC.orders.create({
+          cliente: cliente,
+          endereco: endereco,
+          pagamento: pagamentoInfo,
+          observacoes: v('observacoes'),
+          aceiteTermos: $('aceite').checked,
+          confirmaMaioridade: !!($('maioridade') && $('maioridade').checked),
+        });
+      })
+      .then(function (res) {
+        // Cartão com servidor: conclui no ambiente seguro do Mercado Pago.
+        if (res.pagamento && res.pagamento.checkoutUrl) {
+          SC.ui.announce('Levando você ao Mercado Pago…');
+          window.location.href = res.pagamento.checkoutUrl;
+          return;
+        }
+        SC.navigate('pedido', { id: res.pedido.id, novo: 1 });
+      })
+      .catch(function (err) {
+        botao.disabled = false;
+        botao.removeAttribute('aria-busy');
+        SC.ui.toast(err.message, 'erro');
+      });
   });
 })();
