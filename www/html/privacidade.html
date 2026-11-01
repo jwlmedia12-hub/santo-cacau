@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#fdf9f3" />
+    <meta name="description" content="Como a Santo Cacau coleta, usa, compartilha e protege seus dados pessoais, conforme a LGPD." />
+    <title>Política de Privacidade — Santo Cacau</title>
+    <link rel="icon" href="../img/logo.png" />
+    <link rel="manifest" href="../manifest.webmanifest" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@600;700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=block" />
+    <link rel="stylesheet" href="../css/styles.css" />
+    <script src="../js/theme.js"></script>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script src="../js/tailwind.config.js"></script>
+    <script src="../js/empresa.js" defer></script>
+    <script src="../js/data.js" defer></script>
+    <script src="../js/router.js" defer></script>
+    <script src="../js/store.js" defer></script>
+    <script src="../js/layout.js" defer></script>
+    <script src="../js/a11y.js" defer></script>
+    <script src="../js/consent.js" defer></script>
+    <script src="../js/pages/legal.js" defer></script>
+  </head>
+  <body data-route="privacidade">
+    <main id="conteudo">
+      <div class="container-estreito max-w-3xl flex flex-col gap-6 pt-2">
+        <header class="flex flex-col gap-2">
+          <p class="text-label-sm text-secondary uppercase tracking-widest">Políticas</p>
+          <h1 class="font-titulo text-headline-xl">Política de Privacidade</h1>
+          <p class="text-body-sm text-on-surface-variant">Última atualização: <span data-empresa="atualizacaoPoliticas"></span></p>
+          <div id="acoes-pagina" class="flex flex-wrap gap-2"></div>
+        </header>
+
+        <div class="card rounded-xl bg-secondary-fixed text-on-secondary-fixed p-4">
+          <h2 class="text-title-md mb-1">Resumo em linguagem simples</h2>
+          <ul class="list-disc pl-5 text-body-md flex flex-col gap-1">
+            <li>Usamos seus dados para entregar seus pedidos, cuidar da sua conta e do Passaporte, e falar com você.</li>
+            <li>Não vendemos seus dados. Compartilhamos só o necessário com quem nos ajuda a entregar e cobrar.</li>
+            <li>Ofertas por e-mail ou WhatsApp só com sua autorização, que pode ser retirada a qualquer momento.</li>
+            <li>Você pode ver, corrigir, baixar ou apagar seus dados em <a class="underline font-semibold" href="dashboard.html#privacidade">Minha conta › Privacidade</a>.</li>
+          </ul>
+        </div>
+
+        <div id="sumario"></div>
+
+        <article class="prose-legal">
+          <h2>Quem somos e como falar conosco</h2>
+          <p>
+            A <strong data-empresa="razaoSocial"></strong>, inscrita no CNPJ <span data-empresa="cnpj"></span>, com sede em
+            <span data-empresa="endereco"></span> (“Santo Cacau”, “nós”), é a <strong>controladora</strong> dos dados
+            pessoais tratados no site, no aplicativo e nas boutiques, nos termos da Lei nº 13.709/2018 (Lei Geral de
+            Proteção de Dados Pessoais — LGPD).
+          </p>
+          <p>
+            <strong>Encarregado pelo tratamento de dados (DPO):</strong> <span data-empresa="encarregadoNome"></span> —
+            <a data-empresa="encarregadoEmail" data-empresa-link="mailto" href="#"></a>.
+          </p>
+
+          <h2>Quais dados coletamos</h2>
+          <h3>Dados que você nos informa</h3>
+          <ul>
+            <li><strong>Cadastro:</strong> nome, e-mail, CPF, celular, data de nascimento e senha (guardada de forma cifrada).</li>
+            <li><strong>Compras:</strong> endereço de entrega, itens, valores, forma de pagamento (no cartão, apenas os 4 últimos dígitos) e mensagem do cartão de presente.</li>
+            <li><strong>Passaporte:</strong> saldo e extrato de Grãos, resgates e agendamentos de experiências, incluindo necessidades de acessibilidade que você decidir informar.</li>
+            <li><strong>Atendimento:</strong> mensagens e informações que você envia pelos nossos canais.</li>
+            <li><strong>Preferências:</strong> restrições alimentares e favoritos.</li>
+          </ul>
+          <h3>Dados coletados automaticamente</h3>
+          <ul>
+            <li>Dados técnicos de acesso (endereço IP, data e hora, navegador), que o Marco Civil da Internet (Lei nº 12.965/2014, art. 15) nos obriga a guardar por 6 meses.</li>
+            <li>Informações salvas no seu aparelho (cookies e armazenamento local), descritas na <a href="cookies.html">Política de Cookies</a>.</li>
+          </ul>
+          <h3>Dados sensíveis</h3>
+          <p>
+            Informações sobre deficiência ou restrições alimentares por saúde podem ser dados sensíveis (LGPD, art. 5º, II).
+            Só as tratamos quando você as fornece para receber atendimento adequado (por exemplo, pedir intérprete de Libras
+            em uma degustação), com seu consentimento específico, e você pode apagá-las a qualquer momento. Suas preferências
+            do painel de acessibilidade ficam apenas no seu aparelho e não são enviadas para nós.
+          </p>
+
+          <h2>Para que usamos e com qual base legal</h2>
+          <table>
+            <caption class="sr-only">Finalidades do tratamento e bases legais</caption>
+            <thead>
+              <tr><th scope="col">Finalidade</th><th scope="col">Base legal (LGPD, art. 7º)</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Processar, entregar e dar suporte aos pedidos</td><td>Execução de contrato (V)</td></tr>
+              <tr><td>Criar e manter sua conta e o Passaporte</td><td>Execução de contrato (V)</td></tr>
+              <tr><td>Emitir nota fiscal e cumprir obrigações fiscais e de consumo</td><td>Obrigação legal (II)</td></tr>
+              <tr><td>Prevenir fraudes e proteger sua conta</td><td>Proteção ao crédito (X) e legítimo interesse (IX)</td></tr>
+              <tr><td>Enviar ofertas e novidades</td><td>Consentimento (I) — opcional e revogável</td></tr>
+              <tr><td>Estatísticas de uso do site (cookies opcionais)</td><td>Consentimento (I)</td></tr>
+              <tr><td>Defender direitos em processos</td><td>Exercício regular de direitos (VI)</td></tr>
+            </tbody>
+          </table>
+
+          <h2>Com quem compartilhamos</h2>
+          <p>Não vendemos dados pessoais. Compartilhamos apenas o necessário com:</p>
+          <ul>
+            <li><strong>Transportadoras e entregadores:</strong> nome, endereço e telefone para a entrega.</li>
+            <li><strong>Instituições de pagamento e antifraude:</strong> dados para processar o pagamento com segurança. Os dados completos do cartão são tratados diretamente pela instituição de pagamento.</li>
+            <li><strong>Serviços de tecnologia:</strong> hospedagem, e-mail e atendimento, sob contrato de confidencialidade.</li>
+            <li><strong>Serviços públicos e de terceiros usados no site:</strong> ViaCEP (consulta de endereço pelo CEP digitado), VLibras do Governo Federal (tradução para Libras, quando ativado) e Google Fonts (fontes do site).</li>
+            <li><strong>Autoridades:</strong> quando houver obrigação legal ou ordem judicial.</li>
+          </ul>
+
+          <h2>Transferência internacional</h2>
+          <p>
+            Alguns fornecedores de tecnologia (como serviços de fontes e hospedagem) podem processar dados técnicos fora do
+            Brasil. Nesses casos, exigimos garantias de proteção compatíveis com a LGPD (art. 33).
+          </p>
+
+          <h2>Por quanto tempo guardamos</h2>
+          <table>
+            <caption class="sr-only">Prazos de retenção dos dados</caption>
+            <thead>
+              <tr><th scope="col">Dado</th><th scope="col">Prazo</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Conta e Passaporte</td><td>Enquanto a conta estiver ativa</td></tr>
+              <tr><td>Pedidos e notas fiscais</td><td>5 anos (legislação tributária); após excluir a conta, sem identificação pessoal</td></tr>
+              <tr><td>Registros de acesso</td><td>6 meses (Marco Civil da Internet)</td></tr>
+              <tr><td>Consentimento de marketing</td><td>Até você revogar</td></tr>
+              <tr><td>Mensagens de atendimento</td><td>2 anos</td></tr>
+            </tbody>
+          </table>
+
+          <h2>Seus direitos</h2>
+          <p>Conforme o art. 18 da LGPD, você pode, gratuitamente:</p>
+          <ul>
+            <li>confirmar se tratamos seus dados e acessá-los;</li>
+            <li>corrigir dados incompletos, inexatos ou desatualizados;</li>
+            <li>pedir anonimização, bloqueio ou eliminação de dados desnecessários ou tratados em desconformidade;</li>
+            <li>receber seus dados em formato estruturado (portabilidade);</li>
+            <li>eliminar dados tratados com base no consentimento e revogar o consentimento;</li>
+            <li>saber com quem compartilhamos seus dados;</li>
+            <li>pedir revisão de decisões automatizadas.</li>
+          </ul>
+          <p>
+            <strong>Como exercer:</strong> pela área <a href="dashboard.html#privacidade">Minha conta › Privacidade</a>
+            (baixar dados, revogar ofertas e excluir conta na hora), pela <a href="ajuda.html#contato">Central de ajuda</a>
+            (assunto “Direitos LGPD”) ou pelo e-mail <a data-empresa="encarregadoEmail" data-empresa-link="mailto" href="#"></a>.
+            Respondemos em até 15 dias. Se não ficar satisfeito, você pode reclamar à Autoridade Nacional de Proteção de
+            Dados (ANPD) em <a href="https://www.gov.br/anpd" target="_blank" rel="noopener">gov.br/anpd<span class="sr-only"> (abre em nova janela)</span></a>.
+          </p>
+
+          <h2>Segurança</h2>
+          <p>
+            Usamos conexão criptografada (HTTPS), senhas armazenadas com função de derivação criptográfica, controle de acesso
+            por necessidade e monitoramento. Nenhum sistema é 100% seguro: se ocorrer um incidente com risco relevante, avisaremos
+            você e a ANPD, conforme o art. 48 da LGPD. Nunca pedimos sua senha por e-mail, telefone ou WhatsApp.
+          </p>
+
+          <h2>Crianças e adolescentes</h2>
+          <p>
+            O cadastro e as compras são destinados a maiores de 18 anos. Não coletamos intencionalmente dados de crianças e
+            adolescentes. Se identificarmos um cadastro nessa situação, ele será excluído.
+          </p>
+
+          <h2>Cookies</h2>
+          <p>
+            Veja quais tecnologias usamos e como escolher na <a href="cookies.html">Política de Cookies</a>. Você pode mudar
+            suas escolhas a qualquer momento em
+            <button type="button" data-abrir-cookies class="underline font-semibold text-secondary">Gerenciar cookies</button>.
+          </p>
+
+          <h2>Alterações desta política</h2>
+          <p>
+            Podemos atualizar esta política. Mudanças relevantes serão avisadas no site e, se você tiver conta, por e-mail.
+            Quando a mudança exigir, pediremos novo consentimento.
+          </p>
+        </article>
+      </div>
+    </main>
+  </body>
+</html>

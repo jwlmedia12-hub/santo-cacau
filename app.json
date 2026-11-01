@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "Santo Cacau",
+    "slug": "santo-cacau",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./src/assets/icon.png",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#fdf9f3",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "br.com.santocacau.app"
+    },
+    "android": {
+      "package": "br.com.santocacau.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./src/assets/icon.png",
+        "backgroundColor": "#fdf9f3"
+      }
+    },
+    "web": {
+      "name": "Santo Cacau",
+      "favicon": "./src/assets/icon.png",
+      "themeColor": "#fdf9f3",
+      "backgroundColor": "#fdf9f3"
+    },
+    "plugins": [
+      "expo-status-bar"
+    ]
+  }
+}

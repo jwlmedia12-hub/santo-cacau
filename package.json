@@ -1,0 +1,33 @@
+{
+  "name": "santo-cacau",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "site": "http-server www -p 8080 -c-1",
+    "start": "concurrently -k -n site,app -c yellow,cyan \"npm:site\" \"npm:app\"",
+    "web": "concurrently -k -n site,app -c yellow,cyan \"npm:site\" \"expo start --web\"",
+    "android": "concurrently -k -n site,app -c yellow,cyan \"npm:site\" \"expo start --android\"",
+    "ios": "concurrently -k -n site,app -c yellow,cyan \"npm:site\" \"expo start --ios\"",
+    "format": "prettier --write \"www/**/*.{html,css,js}\" \"src/**/*.js\" \"*.js\"",
+    "app": "expo start"
+  },
+  "dependencies": {
+    "@expo/metro-runtime": "~58.0.15",
+    "expo": "~58.0.19",
+    "expo-constants": "~58.0.13",
+    "expo-speech": "~58.0.3",
+    "expo-status-bar": "~58.0.4",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-native": "0.88.0",
+    "react-native-safe-area-context": "~5.10.1",
+    "react-native-web": "^0.21.4",
+    "react-native-webview": "14.0.1"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.6",
+    "http-server": "^14.1.1",
+    "prettier": "^3.9.10"
+  }
+}

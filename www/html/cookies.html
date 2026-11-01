@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#fdf9f3" />
+    <meta name="description" content="Quais cookies e tecnologias de armazenamento a Santo Cacau usa e como gerenciar suas escolhas." />
+    <title>Política de Cookies — Santo Cacau</title>
+    <link rel="icon" href="../img/logo.png" />
+    <link rel="manifest" href="../manifest.webmanifest" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@600;700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=block" />
+    <link rel="stylesheet" href="../css/styles.css" />
+    <script src="../js/theme.js"></script>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script src="../js/tailwind.config.js"></script>
+    <script src="../js/empresa.js" defer></script>
+    <script src="../js/data.js" defer></script>
+    <script src="../js/router.js" defer></script>
+    <script src="../js/store.js" defer></script>
+    <script src="../js/layout.js" defer></script>
+    <script src="../js/a11y.js" defer></script>
+    <script src="../js/consent.js" defer></script>
+    <script src="../js/pages/legal.js" defer></script>
+  </head>
+  <body data-route="cookies">
+    <main id="conteudo">
+      <div class="container-estreito max-w-3xl flex flex-col gap-6 pt-2">
+        <header class="flex flex-col gap-2">
+          <p class="text-label-sm text-secondary uppercase tracking-widest">Políticas</p>
+          <h1 class="font-titulo text-headline-xl">Política de Cookies</h1>
+          <p class="text-body-sm text-on-surface-variant">Última atualização: <span data-empresa="atualizacaoPoliticas"></span></p>
+          <div id="acoes-pagina" class="flex flex-wrap gap-2"></div>
+        </header>
+
+        <div class="card rounded-xl bg-surface-container-low p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+          <p class="flex-1 text-body-md">Você pode aceitar, recusar ou personalizar os cookies opcionais a qualquer momento.</p>
+          <button type="button" data-abrir-cookies class="btn tap px-5 rounded-full bg-primary text-on-primary text-label-lg flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined">cookie</span>Gerenciar cookies
+          </button>
+        </div>
+
+        <div id="sumario"></div>
+
+        <article class="prose-legal">
+          <h2>O que são cookies</h2>
+          <p>
+            Cookies e tecnologias semelhantes (como o armazenamento local do navegador) são pequenos arquivos guardados no seu
+            aparelho para lembrar informações entre uma visita e outra — por exemplo, os itens da sua sacola.
+          </p>
+
+          <h2>Categorias que usamos</h2>
+          <h3>Necessários (sempre ativos)</h3>
+          <p>
+            Indispensáveis para o site funcionar e para atender o que você pede. Não dependem de consentimento (LGPD, art. 7º,
+            V e IX), mas você pode apagá-los pelo navegador — o site deixará de lembrar sua sacola e seu login.
+          </p>
+          <table>
+            <caption class="sr-only">Armazenamentos necessários</caption>
+            <thead><tr><th scope="col">Nome</th><th scope="col">Para que serve</th><th scope="col">Duração</th></tr></thead>
+            <tbody>
+              <tr><td>sc:sacola</td><td>Itens da sua sacola</td><td>Até você esvaziar</td></tr>
+              <tr><td>sc:checkout</td><td>Cupom, CEP e forma de entrega escolhidos</td><td>Até concluir a compra</td></tr>
+              <tr><td>sc:sessao</td><td>Mantém você conectado(a)</td><td>Até sair (ou fechar o navegador, se não marcar “manter conectado”)</td></tr>
+              <tr><td>sc:usuarios, sc:pedidos</td><td>Conta e pedidos (versão de demonstração que guarda no aparelho)</td><td>Até excluir a conta</td></tr>
+              <tr><td>sc:favoritos</td><td>Produtos que você marcou como favoritos</td><td>Até você desmarcar</td></tr>
+              <tr><td>sc:a11y</td><td>Suas preferências de acessibilidade (tamanho do texto, contraste etc.)</td><td>Até você restaurar o padrão</td></tr>
+              <tr><td>sc:consentimento</td><td>Registro das suas escolhas de cookies</td><td>Até a próxima atualização desta política</td></tr>
+            </tbody>
+          </table>
+
+          <h3>Estatísticas (opcional)</h3>
+          <p>
+            Ajudam a entender, de forma agregada, quais páginas são mais visitadas. <strong>No momento não usamos nenhuma
+            ferramenta desta categoria.</strong> Se passarmos a usar, ela será listada aqui e só funcionará com sua autorização.
+          </p>
+
+          <h3>Marketing (opcional)</h3>
+          <p>
+            Permitem mostrar anúncios da Santo Cacau em outros sites e redes sociais. <strong>No momento não usamos nenhuma
+            ferramenta desta categoria.</strong> Se passarmos a usar, ela será listada aqui e só funcionará com sua autorização.
+          </p>
+
+          <h2>Serviços de terceiros</h2>
+          <table>
+            <caption class="sr-only">Serviços de terceiros usados no site</caption>
+            <thead><tr><th scope="col">Serviço</th><th scope="col">Uso</th><th scope="col">Quando é carregado</th></tr></thead>
+            <tbody>
+              <tr><td>Google Fonts</td><td>Fontes e ícones do site; recebe o endereço IP para entregar os arquivos</td><td>Em todas as páginas</td></tr>
+              <tr><td>VLibras (Governo Federal)</td><td>Intérprete virtual de Libras; pode guardar preferências do próprio widget</td><td>Quando o recurso “Tradutor de Libras” está ativo</td></tr>
+              <tr><td>ViaCEP</td><td>Preencher o endereço a partir do CEP</td><td>Somente quando você digita um CEP</td></tr>
+              <tr><td>Correios e Google Maps</td><td>Busca de CEP e mapa das boutiques</td><td>Somente se você clicar nos links</td></tr>
+            </tbody>
+          </table>
+
+          <h2>Como gerenciar</h2>
+          <ul>
+            <li>Pelo botão <button type="button" data-abrir-cookies class="underline font-semibold text-secondary">Gerenciar cookies</button>, disponível também no rodapé de todas as páginas.</li>
+            <li>Pelas configurações do navegador, apagando os dados do site. Veja como no
+              <a href="https://support.google.com/chrome/answer/95647?hl=pt-BR" target="_blank" rel="noopener">Chrome<span class="sr-only"> (abre em nova janela)</span></a>,
+              <a href="https://support.apple.com/pt-br/guide/safari/sfri11471/mac" target="_blank" rel="noopener">Safari<span class="sr-only"> (abre em nova janela)</span></a>,
+              <a href="https://support.mozilla.org/pt-BR/kb/limpe-cookies-e-dados-de-sites-no-firefox" target="_blank" rel="noopener">Firefox<span class="sr-only"> (abre em nova janela)</span></a> e
+              <a href="https://support.microsoft.com/pt-br/microsoft-edge" target="_blank" rel="noopener">Edge<span class="sr-only"> (abre em nova janela)</span></a>.
+            </li>
+          </ul>
+
+          <h2>Dúvidas</h2>
+          <p>
+            Fale com nosso encarregado de dados pelo e-mail <a data-empresa="encarregadoEmail" data-empresa-link="mailto" href="#"></a>
+            ou leia a <a href="privacidade.html">Política de Privacidade</a>.
+          </p>
+        </article>
+      </div>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#fdf9f3" />
+    <meta name="description" content="Catálogo de chocolates artesanais Santo Cacau: trufas, bombons, barras e kits." />
+    <title>Chocolates — Santo Cacau</title>
+    <link rel="icon" href="../img/logo.png" />
+    <link rel="apple-touch-icon" href="../img/logo.png" />
+    <link rel="manifest" href="../manifest.webmanifest" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@600;700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=block" />
+    <link rel="stylesheet" href="../css/styles.css" />
+    <script src="../js/theme.js"></script>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script src="../js/tailwind.config.js"></script>
+    <script src="../js/empresa.js" defer></script>
+    <script src="../js/data.js" defer></script>
+    <script src="../js/router.js" defer></script>
+    <script src="../js/store.js" defer></script>
+    <script src="../js/layout.js" defer></script>
+    <script src="../js/a11y.js" defer></script>
+    <script src="../js/consent.js" defer></script>
+    <script src="../js/pages/catalogo.js" defer></script>
+  </head>
+  <body data-route="catalogo">
+    <noscript><p style="padding: 1rem; background: #ffe088; color: #000">Para comprar, ative o JavaScript do seu navegador.</p></noscript>
+    <main id="conteudo">
+      <div class="container-sc">
+        <header class="flex flex-col gap-1 pt-2">
+          <p class="text-label-sm text-secondary uppercase tracking-widest">Criações da chocolateria</p>
+          <h1 class="font-titulo text-headline-xl text-on-surface">Chocolates</h1>
+          <p class="text-body-md text-on-surface-variant">Lotes frescos temperados diariamente em nossa fábrica.</p>
+        </header>
+
+        <!-- Convite ao Passaporte (oculto para quem já entrou) -->
+        <aside id="convite-passaporte" aria-label="Passaporte Santo Cacau" class="card mt-4 rounded-xl bg-cacau text-on-cacau p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+          <span class="w-11 h-11 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined">stars</span>
+          </span>
+          <p class="flex-1 text-body-sm text-on-cacau-muted">
+            <strong class="text-ouro">Passaporte Cacau:</strong> entre ou cadastre-se para acumular
+            Grãos Dourados a cada pedido e ganhar 100 Grãos de boas-vindas.
+          </p>
+          <a href="login.html" class="btn tap px-5 rounded-full bg-ouro text-on-ouro text-label-lg flex items-center justify-center gap-1">
+            Entrar ou cadastrar
+            <span class="material-symbols-outlined text-[1.125rem]">arrow_forward</span>
+          </a>
+        </aside>
+
+        <!-- Filtros -->
+        <form id="filtros" role="search" aria-label="Filtrar chocolates" class="mt-6 flex flex-col gap-4">
+          <div>
+            <label for="filtro-busca" class="text-label-lg text-on-surface block mb-1">Buscar no catálogo</label>
+            <input id="filtro-busca" name="q" type="search" class="campo" placeholder="Ex.: trufa, vegano, presente" autocomplete="off" />
+          </div>
+
+          <fieldset>
+            <legend class="text-label-lg text-on-surface mb-2 flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-secondary text-[1.25rem]">filter_vintage</span>
+              Intensidade do cacau
+            </legend>
+            <div id="filtro-intensidade" class="flex gap-2 overflow-x-auto no-scrollbar py-1 -mx-4 px-4 sm:flex-wrap sm:mx-0 sm:px-0"></div>
+          </fieldset>
+
+          <details class="rounded-xl border border-outline-variant bg-surface-container-lowest">
+            <summary class="tap cursor-pointer px-4 py-3 text-label-lg flex items-center gap-2">
+              <span class="material-symbols-outlined text-secondary">tune</span>
+              Mais filtros: dieta, coleção e ordem
+            </summary>
+            <div class="px-4 pb-4 flex flex-col gap-4">
+              <fieldset>
+                <legend class="text-label-lg text-on-surface mb-2 flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-secondary text-[1.25rem]">eco</span>
+                  Dieta e restrições
+                </legend>
+                <div id="filtro-dietas" class="flex flex-wrap gap-2"></div>
+              </fieldset>
+              <div class="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label for="filtro-colecao" class="text-label-lg text-on-surface block mb-1">Coleção</label>
+                  <select id="filtro-colecao" name="colecao" class="campo"></select>
+                </div>
+                <div>
+                  <label for="filtro-ordem" class="text-label-lg text-on-surface block mb-1">Ordenar por</label>
+                  <select id="filtro-ordem" name="ordem" class="campo">
+                    <option value="relevancia">Mais relevantes</option>
+                    <option value="menor-preco">Menor preço</option>
+                    <option value="maior-preco">Maior preço</option>
+                    <option value="avaliacao">Melhor avaliados</option>
+                    <option value="favoritos">Meus favoritos primeiro</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </details>
+
+          <div class="flex items-center justify-between gap-2">
+            <p id="resultado-status" role="status" aria-live="polite" class="text-label-lg text-on-surface"></p>
+            <button type="button" id="limpar-filtros" class="tap px-3 rounded-full text-label-lg text-secondary underline underline-offset-2">
+              Limpar filtros
+            </button>
+          </div>
+        </form>
+
+        <!-- Resultados -->
+        <section aria-labelledby="resultado-titulo" class="mt-4">
+          <h2 id="resultado-titulo" class="sr-only">Resultados</h2>
+          <ul id="lista-produtos" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"></ul>
+          <div id="vazio" hidden class="card rounded-xl bg-surface-container-low p-6 text-center flex flex-col items-center gap-3">
+            <span class="material-symbols-outlined text-[2.5rem] text-secondary">search_off</span>
+            <p class="text-title-md text-on-surface">Nenhum chocolate encontrado com esses filtros.</p>
+            <button type="button" data-limpar class="btn tap px-5 rounded-full bg-primary text-on-primary text-label-lg">Limpar filtros</button>
+          </div>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>
