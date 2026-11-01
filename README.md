@@ -28,6 +28,7 @@ site, o app e a versão instalável (PWA).
 | `npm run android` | Site + app no emulador/celular Android                 |
 | `npm run site`    | Só o site em http://localhost:8080                     |
 | `npm run format`  | Formata HTML/CSS/JS com Prettier                       |
+| `npm run deploy:pages` | Atualiza o site no GitHub Pages (faça commit antes) |
 
 No celular, use o **Expo Go** na mesma rede Wi-Fi do computador. Se o site não
 abrir, libere a porta 8080 no Firewall do Windows.

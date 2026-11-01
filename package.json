@@ -10,7 +10,8 @@
     "android": "concurrently -k -n site,app -c yellow,cyan \"npm:site\" \"expo start --android\"",
     "ios": "concurrently -k -n site,app -c yellow,cyan \"npm:site\" \"expo start --ios\"",
     "format": "prettier --write \"www/**/*.{html,css,js}\" \"src/**/*.js\" \"*.js\"",
-    "app": "expo start"
+    "app": "expo start",
+    "deploy:pages": "git subtree split --prefix www -b gh-pages-temp && git push -f origin gh-pages-temp:gh-pages && git branch -D gh-pages-temp"
   },
   "dependencies": {
     "@expo/metro-runtime": "~58.0.15",
