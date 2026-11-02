@@ -24,7 +24,7 @@ serve o site, o app e a versão instalável (PWA).
 | Modo              | Onde                                  | Conta, pedidos e Grãos         | Pagamento                       |
 | ----------------- | ------------------------------------- | ------------------------------ | ------------------------------- |
 | **Demonstração**  | GitHub Pages ou `npm run site`        | No navegador (`localStorage`)  | Simulado                        |
-| **Com servidor**  | `npm run server` ou hospedagem (Render) | Banco de dados SQLite        | Mercado Pago (ou simulado sem credenciais) |
+| **Com servidor**  | `npm run server` ou hospedagem (Render) | Supabase (PostgreSQL) ou SQLite local | Mercado Pago (ou simulado sem credenciais) |
 
 O modo é escolhido em `www/js/config.js` (`apiUrl`). O servidor entrega esse
 arquivo já configurado, então quem abre o site pelo servidor usa a API
@@ -83,6 +83,28 @@ libere a porta 3000 no Firewall do Windows.
 - **LGPD:** exportação dos dados (JSON) e exclusão da conta; pedidos ficam
   guardados sem dados pessoais (exigência fiscal).
 
+### Banco no Supabase (gratuito)
+
+Sem configurar nada, o servidor usa um arquivo SQLite local, bom para testar
+no computador. Para usar o Supabase:
+
+1. Crie uma conta e um projeto em https://supabase.com (região **South
+   America (São Paulo)**) e anote a senha do banco.
+2. No projeto, clique em **Connect** e copie a URI do **Session pooler**
+   (funciona em qualquer rede e no Render).
+3. Cole em `DATABASE_URL` no `.env`, trocando `[YOUR-PASSWORD]` pela senha.
+4. Rode `npm run server`: as tabelas são criadas sozinhas no schema
+   `santo_cacau`, com RLS ativado. O schema fica fora do `public`, que o
+   Supabase expõe pela API REST, então só o servidor acessa os dados (nunca
+   publique a senha do banco nem a chave `service_role`).
+
+No painel do Supabase (**Table Editor**, schema `santo_cacau`) dá para ver
+usuários, pedidos e mensagens de contato.
+
+**Limites do plano gratuito:** o Supabase pausa projetos sem uso por 7 dias
+(é só reativar no painel) e o Render gratuito "dorme" após 15 minutos sem
+acesso — a primeira visita depois disso demora cerca de 1 minuto.
+
 ### Estrutura do servidor (`server/`)
 
 | Arquivo        | Responsabilidade                                                  |
@@ -91,16 +113,17 @@ libere a porta 3000 no Firewall do Windows.
 | `app.js`       | Rotas da API, segurança e site estático                           |
 | `servicos.js`  | Regras de negócio: contas, Grãos, pedidos, status e contato       |
 | `pagamento.js` | Mercado Pago (Pix, Checkout Pro, webhook) e modo simulado         |
-| `db.js`        | Banco SQLite (tabelas criadas automaticamente)                    |
+| `db.js`        | Banco: PostgreSQL/Supabase ou SQLite (tabelas criadas sozinhas)   |
 | `catalogo.js`  | Lê catálogo e regras de `www/js` (mesma fonte do site)            |
 | `email.js`     | E-mails por SMTP (ou no terminal, sem configuração)               |
 
 ### Publicar o servidor (Render)
 
-O arquivo `render.yaml` publica tudo em um só endereço com HTTPS: em
-https://render.com, clique em **New › Blueprint**, escolha este repositório e
-preencha `PUBLIC_URL` e `MP_ACCESS_TOKEN`. O banco fica num disco persistente
-(exige plano pago). Depois, coloque o endereço do servidor em
+O arquivo `render.yaml` publica tudo em um só endereço com HTTPS, no plano
+gratuito: em https://render.com, clique em **New › Blueprint**, escolha este
+repositório e preencha `DATABASE_URL` (Supabase), `PUBLIC_URL` (o endereço
+que o Render der, ex.: `https://santo-cacau.onrender.com`) e
+`MP_ACCESS_TOKEN`. Depois, coloque o endereço do servidor em
 `PRODUCTION_SITE_URL` (`src/config.js`) para o app usar o servidor publicado.
 Se quiser que o site do GitHub Pages também use o servidor, ponha o mesmo
 endereço em `apiUrl` (`www/js/config.js`) e mantenha o GitHub Pages em
@@ -186,4 +209,5 @@ por `layout.js`.
    configurar o webhook com `MP_WEBHOOK_SECRET` e o SMTP para os e-mails.
 4. **Tailwind em produção.** O CDN é ótimo para protótipo; para performance,
    gere o CSS com o Tailwind CLI.
-5. **Backup do banco.** Copie o arquivo de `DB_PATH` regularmente.
+5. **Backup do banco.** O plano gratuito do Supabase não guarda backups
+   diários para restaurar; exporte os dados pelo painel de tempos em tempos.

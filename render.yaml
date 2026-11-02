@@ -1,18 +1,19 @@
 # Hospedagem no Render (https://render.com) — "New > Blueprint" e escolha este repositório.
-# Publica o servidor (API + site) em um só endereço, com HTTPS.
+# Publica o servidor (API + site) em um só endereço, com HTTPS, no plano gratuito.
+# O banco de dados fica no Supabase (também gratuito): veja "Banco no Supabase" no README.
 services:
   - type: web
     name: santo-cacau
     runtime: node
-    plan: starter # o disco persistente (banco de dados) exige plano pago
+    plan: free
     buildCommand: npm install --omit=dev --ignore-scripts
     startCommand: node server/index.js
     healthCheckPath: /api/saude
     envVars:
       - key: NODE_VERSION
         value: 24
-      - key: DB_PATH
-        value: /var/data/santo-cacau.db
+      - key: DATABASE_URL
+        sync: false # Supabase > Connect > Session pooler (troque [YOUR-PASSWORD] pela senha)
       - key: PUBLIC_URL
         sync: false # ex.: https://santo-cacau.onrender.com
       - key: MP_ACCESS_TOKEN
@@ -21,7 +22,3 @@ services:
         sync: false
       - key: ALLOWED_ORIGINS
         value: https://jwlmedia12-hub.github.io
-    disk:
-      name: dados
-      mountPath: /var/data
-      sizeGB: 1

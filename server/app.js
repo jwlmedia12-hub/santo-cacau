@@ -3,6 +3,7 @@ const path = require('node:path');
 const express = require('express');
 const s = require('./servicos');
 const pagamento = require('./pagamento');
+const { motor } = require('./db');
 
 const app = express();
 app.disable('x-powered-by');
@@ -67,13 +68,17 @@ function tokenDe(req) {
   return h.startsWith('Bearer ') ? h.slice(7) : null;
 }
 function usuarioOpcional(req, res, next) {
-  req.usuario = s.usuarioDoToken(tokenDe(req));
-  next();
+  s.usuarioDoToken(tokenDe(req)).then((u) => {
+    req.usuario = u;
+    next();
+  }, next);
 }
 function exigeLogin(req, res, next) {
-  req.usuario = s.usuarioDoToken(tokenDe(req));
-  if (!req.usuario) return res.status(401).json({ erro: 'Sua sessão expirou. Entre novamente.' });
-  next();
+  s.usuarioDoToken(tokenDe(req)).then((u) => {
+    req.usuario = u;
+    if (!u) return res.status(401).json({ erro: 'Sua sessão expirou. Entre novamente.' });
+    next();
+  }, next);
 }
 // Converte erros em respostas JSON com mensagem amigável.
 const rota = (fn) => async (req, res) => {
@@ -88,42 +93,42 @@ const rota = (fn) => async (req, res) => {
 
 /* ---------- Rotas ---------- */
 
-app.get('/api/saude', (req, res) => res.json({ ok: true, pagamento: pagamento.provedor }));
+app.get('/api/saude', (req, res) => res.json({ ok: true, pagamento: pagamento.provedor, banco: motor }));
 
-app.post('/api/auth/cadastro', limite(10, 15 * 60000), rota((req, res) => res.status(201).json(s.cadastrar(req.body))));
-app.post('/api/auth/login', limite(10, 15 * 60000), rota((req, res) => res.json(s.entrar(req.body.identificador, req.body.senha))));
-app.post('/api/auth/logout', rota((req, res) => {
-  s.encerrarSessao(tokenDe(req));
+app.post('/api/auth/cadastro', limite(10, 15 * 60000), rota(async (req, res) => res.status(201).json(await s.cadastrar(req.body))));
+app.post('/api/auth/login', limite(10, 15 * 60000), rota(async (req, res) => res.json(await s.entrar(req.body.identificador, req.body.senha))));
+app.post('/api/auth/logout', rota(async (req, res) => {
+  await s.encerrarSessao(tokenDe(req));
   res.json({ ok: true });
 }));
-app.post('/api/auth/senha', exigeLogin, limite(10, 15 * 60000), rota((req, res) => {
-  s.trocarSenha(req.usuario, req.body.atual, req.body.nova);
+app.post('/api/auth/senha', exigeLogin, limite(10, 15 * 60000), rota(async (req, res) => {
+  await s.trocarSenha(req.usuario, req.body.atual, req.body.nova);
   res.json({ ok: true });
 }));
 app.post('/api/auth/recuperar', limite(5, 15 * 60000), rota(async (req, res) => {
   await s.pedirRedefinicao(req.body.email, SITE_URL);
   res.json({ ok: true });
 }));
-app.post('/api/auth/redefinir', limite(10, 15 * 60000), rota((req, res) => {
-  s.redefinirSenha(req.body.token, req.body.senha);
+app.post('/api/auth/redefinir', limite(10, 15 * 60000), rota(async (req, res) => {
+  await s.redefinirSenha(req.body.token, req.body.senha);
   res.json({ ok: true });
 }));
 
-app.get('/api/eu', exigeLogin, rota((req, res) => res.json({ usuario: s.usuarioPublico(req.usuario) })));
-app.patch('/api/eu', exigeLogin, rota((req, res) => res.json({ usuario: s.atualizarPerfil(req.usuario, req.body) })));
-app.post('/api/eu/marketing', exigeLogin, rota((req, res) => res.json({ usuario: s.marketing(req.usuario, req.body.aceito) })));
-app.post('/api/eu/resgates', exigeLogin, rota((req, res) => res.json(s.resgatar(req.usuario, req.body.recompensaId))));
-app.post('/api/eu/agendamentos', exigeLogin, rota((req, res) => res.json({ usuario: s.agendar(req.usuario, req.body) })));
-app.delete('/api/eu/agendamentos/:id', exigeLogin, rota((req, res) => res.json({ usuario: s.cancelarAgendamento(req.usuario, req.params.id) })));
-app.get('/api/eu/exportar', exigeLogin, rota((req, res) => res.json(s.exportar(req.usuario))));
-app.delete('/api/eu', exigeLogin, rota((req, res) => {
-  s.excluirConta(req.usuario);
+app.get('/api/eu', exigeLogin, rota(async (req, res) => res.json({ usuario: await s.usuarioPublico(req.usuario) })));
+app.patch('/api/eu', exigeLogin, rota(async (req, res) => res.json({ usuario: await s.atualizarPerfil(req.usuario, req.body) })));
+app.post('/api/eu/marketing', exigeLogin, rota(async (req, res) => res.json({ usuario: await s.marketing(req.usuario, req.body.aceito) })));
+app.post('/api/eu/resgates', exigeLogin, rota(async (req, res) => res.json(await s.resgatar(req.usuario, req.body.recompensaId))));
+app.post('/api/eu/agendamentos', exigeLogin, rota(async (req, res) => res.json({ usuario: await s.agendar(req.usuario, req.body) })));
+app.delete('/api/eu/agendamentos/:id', exigeLogin, rota(async (req, res) => res.json({ usuario: await s.cancelarAgendamento(req.usuario, req.params.id) })));
+app.get('/api/eu/exportar', exigeLogin, rota(async (req, res) => res.json(await s.exportar(req.usuario))));
+app.delete('/api/eu', exigeLogin, rota(async (req, res) => {
+  await s.excluirConta(req.usuario);
   res.json({ ok: true });
 }));
 
-app.get('/api/pedidos', exigeLogin, rota((req, res) => res.json({ pedidos: s.listarPedidos(req.usuario.id) })));
+app.get('/api/pedidos', exigeLogin, rota(async (req, res) => res.json({ pedidos: await s.listarPedidos(req.usuario.id) })));
 app.get('/api/pedidos/:id', usuarioOpcional, rota(async (req, res) => {
-  let linha = s.buscarPedido(req.params.id, req.usuario, req.query.token);
+  let linha = await s.buscarPedido(req.params.id, req.usuario, req.query.token);
   if (!linha) return res.status(404).json({ erro: 'Pedido não encontrado.' });
   linha = await s.sincronizar(linha);
   res.json({ pedido: s.pedidoPublico(linha) });
@@ -132,13 +137,14 @@ app.post('/api/pedidos', usuarioOpcional, limite(20, 15 * 60000), rota(async (re
   res.status(201).json(await s.criarPedido(req.usuario, req.body, SITE_URL));
 }));
 // Só existe no modo simulado (sem credenciais do Mercado Pago).
-app.post('/api/pedidos/:id/simular-pagamento', usuarioOpcional, rota((req, res) => {
+app.post('/api/pedidos/:id/simular-pagamento', usuarioOpcional, rota(async (req, res) => {
   if (pagamento.provedor !== 'simulado') return res.status(403).json({ erro: 'Pagamento real: aguarde a confirmação do banco.' });
-  const linha = s.buscarPedido(req.params.id, req.usuario, req.body.token);
+  const linha = await s.buscarPedido(req.params.id, req.usuario, req.body.token);
   if (!linha) return res.status(404).json({ erro: 'Pedido não encontrado.' });
-  s.atualizarStatus(linha.id, 'pago');
-  const atual = s.buscarPedido(linha.id, req.usuario, req.body.token);
-  res.json({ pedido: s.pedidoPublico(atual), usuario: req.usuario ? s.usuarioPublico(s.usuarioDoToken(tokenDe(req))) : undefined });
+  await s.atualizarStatus(linha.id, 'pago');
+  const atual = await s.buscarPedido(linha.id, req.usuario, req.body.token);
+  const usuario = req.usuario ? await s.usuarioPublico(await s.usuarioDoToken(tokenDe(req))) : undefined;
+  res.json({ pedido: s.pedidoPublico(atual), usuario });
 }));
 
 app.post('/api/contato', usuarioOpcional, limite(5, 15 * 60000), rota(async (req, res) => {
@@ -161,6 +167,12 @@ app.post('/api/webhooks/mercadopago', express.json({ limit: '50kb' }), async (re
 });
 
 app.use('/api', (req, res) => res.status(404).json({ erro: 'Rota não encontrada.' }));
+// Falhas fora das rotas (ex.: banco indisponível ao conferir a sessão).
+app.use('/api', (erro, req, res, next) => {
+  console.error(erro);
+  if (res.headersSent) return next(erro);
+  res.status(erro.status || 500).json({ erro: erro.status === 400 ? 'Dados inválidos.' : 'Erro inesperado. Tente novamente em instantes.' });
+});
 
 /* ---------- Site ---------- */
 

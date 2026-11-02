@@ -1,5 +1,6 @@
 // Regras de negócio: contas, Grãos Dourados, pedidos e pagamentos.
-// Toda alteração de saldo acontece aqui, dentro de transações.
+// Toda alteração de saldo acontece aqui, dentro de transações; o saldo é
+// travado (FOR UPDATE) para dois pedidos simultâneos não gastarem os mesmos Grãos.
 const crypto = require('node:crypto');
 const { db, transacao } = require('./db');
 const catalogo = require('./catalogo');
@@ -69,36 +70,36 @@ function confereSenha(senha, guardado) {
 }
 
 const DIAS_SESSAO = 30;
-function criarSessao(usuarioId) {
+async function criarSessao(usuarioId) {
   const token = crypto.randomBytes(32).toString('base64url');
   const expira = new Date(Date.now() + DIAS_SESSAO * 86400000).toISOString();
-  db.prepare('INSERT INTO sessoes (token_hash, usuario_id, criado_em, expira_em) VALUES (?, ?, ?, ?)').run(sha256(token), usuarioId, agora(), expira);
+  await db.run('INSERT INTO sessoes (token_hash, usuario_id, criado_em, expira_em) VALUES (?, ?, ?, ?)', sha256(token), usuarioId, agora(), expira);
   return token;
 }
-function usuarioDoToken(token) {
+async function usuarioDoToken(token) {
   if (!token) return null;
-  const s = db.prepare('SELECT usuario_id, expira_em FROM sessoes WHERE token_hash = ?').get(sha256(token));
+  const s = await db.get('SELECT usuario_id, expira_em FROM sessoes WHERE token_hash = ?', sha256(token));
   if (!s) return null;
   if (s.expira_em < agora()) {
-    db.prepare('DELETE FROM sessoes WHERE token_hash = ?').run(sha256(token));
+    await db.run('DELETE FROM sessoes WHERE token_hash = ?', sha256(token));
     return null;
   }
-  return db.prepare('SELECT * FROM usuarios WHERE id = ?').get(s.usuario_id) || null;
+  return (await db.get('SELECT * FROM usuarios WHERE id = ?', s.usuario_id)) || null;
 }
-function encerrarSessao(token) {
-  db.prepare('DELETE FROM sessoes WHERE token_hash = ?').run(sha256(token || ''));
+async function encerrarSessao(token) {
+  await db.run('DELETE FROM sessoes WHERE token_hash = ?', sha256(token || ''));
 }
 
 /* ---------- Usuário público (mesmo formato do site) ---------- */
 
-function usuarioPublico(u) {
+async function usuarioPublico(u) {
   if (!u) return null;
-  const extrato = db.prepare('SELECT data, descricao, graos, icone FROM extrato WHERE usuario_id = ? ORDER BY id DESC LIMIT 50').all(u.id);
-  const resgates = db.prepare('SELECT recompensa_id AS id, nome, data, codigo FROM resgates WHERE usuario_id = ? ORDER BY data DESC').all(u.id);
-  const agendamentos = db
-    .prepare('SELECT id, experiencia, nome, boutique, data, hora, necessidades, graos FROM agendamentos WHERE usuario_id = ? ORDER BY data, hora')
-    .all(u.id);
-  const pedidosCount = db.prepare('SELECT COUNT(*) AS n FROM pedidos WHERE usuario_id = ?').get(u.id).n;
+  const [extrato, resgates, agendamentos, contagem] = await Promise.all([
+    db.all('SELECT data, descricao, graos, icone FROM extrato WHERE usuario_id = ? ORDER BY id DESC LIMIT 50', u.id),
+    db.all('SELECT recompensa_id AS id, nome, data, codigo FROM resgates WHERE usuario_id = ? ORDER BY data DESC', u.id),
+    db.all('SELECT id, experiencia, nome, boutique, data, hora, necessidades, graos FROM agendamentos WHERE usuario_id = ? ORDER BY data, hora', u.id),
+    db.get('SELECT COUNT(*) AS n FROM pedidos WHERE usuario_id = ?', u.id),
+  ]);
   return {
     id: u.id,
     nome: u.nome,
@@ -107,27 +108,29 @@ function usuarioPublico(u) {
     telefone: u.telefone,
     nascimento: u.nascimento,
     criadoEm: u.criado_em,
-    graos: u.graos,
-    graosTotal: u.graos_total,
-    extrato: extrato.map((e) => ({ ...e })),
-    resgates: resgates.map((r) => ({ ...r })),
-    agendamentos: agendamentos.map((a) => ({ ...a })),
+    graos: Number(u.graos),
+    graosTotal: Number(u.graos_total),
+    extrato: extrato.map((e) => ({ ...e, graos: Number(e.graos) })),
+    resgates,
+    agendamentos: agendamentos.map((a) => ({ ...a, graos: Number(a.graos) })),
     enderecos: parse(u.enderecos, []),
     preferencias: parse(u.preferencias, { dietas: [], avisos: false }),
     consentimentos: parse(u.consentimentos, {}),
-    pedidosCount,
+    pedidosCount: Number(contagem.n),
   };
 }
-const recarregar = (usuarioId) => db.prepare('SELECT * FROM usuarios WHERE id = ?').get(usuarioId);
+const recarregar = (usuarioId, tx = db) => tx.get('SELECT * FROM usuarios WHERE id = ?', usuarioId);
+// Lê o usuário travando a linha até o fim da transação.
+const travar = (tx, usuarioId) => tx.get('SELECT * FROM usuarios WHERE id = ? FOR UPDATE', usuarioId);
 
-function lancarGraos(usuarioId, graos, descricao, icone) {
-  db.prepare('UPDATE usuarios SET graos = graos + ?, graos_total = graos_total + ? WHERE id = ?').run(graos, graos > 0 ? graos : 0, usuarioId);
-  db.prepare('INSERT INTO extrato (usuario_id, data, descricao, graos, icone) VALUES (?, ?, ?, ?, ?)').run(usuarioId, agora(), descricao, graos, icone);
+async function lancarGraos(tx, usuarioId, graos, descricao, icone) {
+  await tx.run('UPDATE usuarios SET graos = graos + ?, graos_total = graos_total + ? WHERE id = ?', graos, graos > 0 ? graos : 0, usuarioId);
+  await tx.run('INSERT INTO extrato (usuario_id, data, descricao, graos, icone) VALUES (?, ?, ?, ?, ?)', usuarioId, agora(), descricao, graos, icone);
 }
 
 /* ---------- Conta ---------- */
 
-function cadastrar(d) {
+async function cadastrar(d) {
   const nome = texto(d.nome, 120);
   const mail = texto(d.email, 200).toLowerCase();
   if (nome.split(/\s+/).length < 2) throw new ErroNegocio('Informe nome e sobrenome.');
@@ -137,48 +140,57 @@ function cadastrar(d) {
   if (idade(d.nascimento) < 18) throw new ErroNegocio('O cadastro é permitido apenas para maiores de 18 anos.');
   if (!senhaForte(d.senha)) throw new ErroNegocio('A senha precisa de 8 caracteres, com letras e números.');
   const cpf = digitos(d.cpf);
-  if (db.prepare('SELECT 1 FROM usuarios WHERE email = ? OR cpf = ?').get(mail, cpf)) {
+  if (await db.get('SELECT 1 AS existe FROM usuarios WHERE email = ? OR cpf = ?', mail, cpf)) {
     throw new ErroNegocio('Já existe uma conta com este e-mail ou CPF.', 409);
   }
   const usuarioId = id('U');
   const data = agora();
-  const bonus = DATA.regras.bonusCadastro;
   const consentimentos = {
     termos: { aceito: true, data, versao: EMPRESA.atualizacaoPoliticas },
     privacidade: { aceito: true, data, versao: EMPRESA.atualizacaoPoliticas },
     marketing: { aceito: !!d.marketing, data },
   };
-  transacao(() => {
-    db.prepare(
-      `INSERT INTO usuarios (id, nome, email, cpf, telefone, nascimento, senha_hash, criado_em, preferencias, consentimentos)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-    ).run(usuarioId, nome, mail, cpf, digitos(d.telefone), texto(d.nascimento, 10), hashSenha(d.senha), data, json({ dietas: [], avisos: !!d.marketing }), json(consentimentos));
-    lancarGraos(usuarioId, bonus, 'Bônus de boas-vindas', 'celebration');
-  });
-  return { token: criarSessao(usuarioId), usuario: usuarioPublico(recarregar(usuarioId)) };
+  try {
+    await transacao(async (tx) => {
+      await tx.run(
+        `INSERT INTO usuarios (id, nome, email, cpf, telefone, nascimento, senha_hash, criado_em, preferencias, consentimentos)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        usuarioId, nome, mail, cpf, digitos(d.telefone), texto(d.nascimento, 10), hashSenha(d.senha), data,
+        json({ dietas: [], avisos: !!d.marketing }), json(consentimentos)
+      );
+      await lancarGraos(tx, usuarioId, DATA.regras.bonusCadastro, 'Bônus de boas-vindas', 'celebration');
+    });
+  } catch (erro) {
+    // Dois cadastros iguais ao mesmo tempo: o banco recusa o segundo.
+    if (/unique|duplicate/i.test(erro.message)) throw new ErroNegocio('Já existe uma conta com este e-mail ou CPF.', 409);
+    throw erro;
+  }
+  return { token: await criarSessao(usuarioId), usuario: await usuarioPublico(await recarregar(usuarioId)) };
 }
 
-function entrar(identificador, senha) {
+async function entrar(identificador, senha) {
   const valor = texto(identificador, 200).toLowerCase();
   const cpf = digitos(identificador);
-  const u = db.prepare('SELECT * FROM usuarios WHERE email = ? OR (? <> \'\' AND cpf = ?)').get(valor, cpf.length === 11 ? cpf : '', cpf);
+  const u = cpf.length === 11
+    ? await db.get('SELECT * FROM usuarios WHERE email = ? OR cpf = ?', valor, cpf)
+    : await db.get('SELECT * FROM usuarios WHERE email = ?', valor);
   // Mesma mensagem nos dois casos: não revela quais e-mails existem.
   if (!u || !confereSenha(senha, u.senha_hash)) throw new ErroNegocio('E-mail/CPF ou senha incorretos.', 401);
-  return { token: criarSessao(u.id), usuario: usuarioPublico(u) };
+  return { token: await criarSessao(u.id), usuario: await usuarioPublico(u) };
 }
 
-function trocarSenha(u, atual, nova) {
+async function trocarSenha(u, atual, nova) {
   if (!confereSenha(atual, u.senha_hash)) throw new ErroNegocio('Senha atual incorreta.');
   if (!senhaForte(nova)) throw new ErroNegocio('A nova senha precisa de 8 caracteres, com letras e números.');
-  db.prepare('UPDATE usuarios SET senha_hash = ? WHERE id = ?').run(hashSenha(nova), u.id);
+  await db.run('UPDATE usuarios SET senha_hash = ? WHERE id = ?', hashSenha(nova), u.id);
 }
 
 async function pedirRedefinicao(mail, siteUrl) {
-  const u = db.prepare('SELECT id, nome, email FROM usuarios WHERE email = ?').get(texto(mail, 200).toLowerCase());
+  const u = await db.get('SELECT id, nome, email FROM usuarios WHERE email = ?', texto(mail, 200).toLowerCase());
   if (!u) return; // resposta neutra
   const token = crypto.randomBytes(32).toString('base64url');
   const expira = new Date(Date.now() + 3600000).toISOString();
-  db.prepare('INSERT INTO redefinicoes (token_hash, usuario_id, expira_em) VALUES (?, ?, ?)').run(sha256(token), u.id, expira);
+  await db.run('INSERT INTO redefinicoes (token_hash, usuario_id, expira_em) VALUES (?, ?, ?)', sha256(token), u.id, expira);
   const link = siteUrl + '/html/login.html?redefinir=' + encodeURIComponent(token);
   await email.enviar({
     para: u.email,
@@ -187,19 +199,19 @@ async function pedirRedefinicao(mail, siteUrl) {
   });
 }
 
-function redefinirSenha(token, nova) {
+async function redefinirSenha(token, nova) {
   if (!senhaForte(nova)) throw new ErroNegocio('A senha precisa de 8 caracteres, com letras e números.');
-  const r = db.prepare('SELECT * FROM redefinicoes WHERE token_hash = ?').get(sha256(String(token || '')));
-  if (!r || r.usado || r.expira_em < agora()) throw new ErroNegocio('Link inválido ou expirado. Peça um novo.');
-  transacao(() => {
-    db.prepare('UPDATE usuarios SET senha_hash = ? WHERE id = ?').run(hashSenha(nova), r.usuario_id);
-    db.prepare('UPDATE redefinicoes SET usado = 1 WHERE token_hash = ?').run(r.token_hash);
+  await transacao(async (tx) => {
+    const r = await tx.get('SELECT * FROM redefinicoes WHERE token_hash = ? FOR UPDATE', sha256(String(token || '')));
+    if (!r || Number(r.usado) || r.expira_em < agora()) throw new ErroNegocio('Link inválido ou expirado. Peça um novo.');
+    await tx.run('UPDATE usuarios SET senha_hash = ? WHERE id = ?', hashSenha(nova), r.usuario_id);
+    await tx.run('UPDATE redefinicoes SET usado = 1 WHERE token_hash = ?', r.token_hash);
     // Por segurança, encerra as sessões abertas.
-    db.prepare('DELETE FROM sessoes WHERE usuario_id = ?').run(r.usuario_id);
+    await tx.run('DELETE FROM sessoes WHERE usuario_id = ?', r.usuario_id);
   });
 }
 
-function atualizarPerfil(u, d) {
+async function atualizarPerfil(u, d) {
   const prefs = parse(u.preferencias, { dietas: [], avisos: false });
   const campos = {};
   if (d.nome !== undefined) {
@@ -218,33 +230,33 @@ function atualizarPerfil(u, d) {
   if (d.endereco) campos.enderecos = json([limparEndereco(d.endereco)]);
   const chaves = Object.keys(campos);
   if (chaves.length) {
-    db.prepare('UPDATE usuarios SET ' + chaves.map((k) => k + ' = ?').join(', ') + ' WHERE id = ?').run(...chaves.map((k) => campos[k]), u.id);
+    await db.run('UPDATE usuarios SET ' + chaves.map((k) => k + ' = ?').join(', ') + ' WHERE id = ?', ...chaves.map((k) => campos[k]), u.id);
   }
-  return usuarioPublico(recarregar(u.id));
+  return usuarioPublico(await recarregar(u.id));
 }
 
-function marketing(u, aceito) {
+async function marketing(u, aceito) {
   const consent = parse(u.consentimentos, {});
   consent.marketing = { aceito: !!aceito, data: agora() };
   const prefs = parse(u.preferencias, {});
   prefs.avisos = !!aceito;
-  db.prepare('UPDATE usuarios SET consentimentos = ?, preferencias = ? WHERE id = ?').run(json(consent), json(prefs), u.id);
-  return usuarioPublico(recarregar(u.id));
+  await db.run('UPDATE usuarios SET consentimentos = ?, preferencias = ? WHERE id = ?', json(consent), json(prefs), u.id);
+  return usuarioPublico(await recarregar(u.id));
 }
 
-function resgatar(u, recompensaId) {
+async function resgatar(u, recompensaId) {
   const rec = DATA.recompensas.find((r) => r.id === recompensaId);
   if (!rec) throw new ErroNegocio('Recompensa não encontrada.', 404);
   const codigo = 'R' + crypto.randomBytes(3).toString('hex').toUpperCase();
-  transacao(() => {
-    if (recarregar(u.id).graos < rec.graos) throw new ErroNegocio('Saldo de Grãos insuficiente.');
-    lancarGraos(u.id, -rec.graos, 'Resgate: ' + rec.nome, 'redeem');
-    db.prepare('INSERT INTO resgates (id, usuario_id, recompensa_id, nome, data, codigo) VALUES (?, ?, ?, ?, ?, ?)').run(id('G'), u.id, rec.id, rec.nome, agora(), codigo);
+  await transacao(async (tx) => {
+    if (Number((await travar(tx, u.id)).graos) < rec.graos) throw new ErroNegocio('Saldo de Grãos insuficiente.');
+    await lancarGraos(tx, u.id, -rec.graos, 'Resgate: ' + rec.nome, 'redeem');
+    await tx.run('INSERT INTO resgates (id, usuario_id, recompensa_id, nome, data, codigo) VALUES (?, ?, ?, ?, ?, ?)', id('G'), u.id, rec.id, rec.nome, agora(), codigo);
   });
-  return { usuario: usuarioPublico(recarregar(u.id)), codigo };
+  return { usuario: await usuarioPublico(await recarregar(u.id)), codigo };
 }
 
-function agendar(u, d) {
+async function agendar(u, d) {
   const x = DATA.experiencias.find((e) => e.id === d.experienciaId);
   if (!x) throw new ErroNegocio('Experiência não encontrada.', 404);
   const boutique = DATA.boutiques.find((b) => b.nome === d.boutique || b.id === d.boutique);
@@ -254,53 +266,54 @@ function agendar(u, d) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(data) || data < amanha) throw new ErroNegocio('Escolha uma data a partir de amanhã.');
   const hora = texto(d.hora, 5);
   if (!['11:00', '15:00', '17:30'].includes(hora)) throw new ErroNegocio('Escolha um horário disponível.');
-  transacao(() => {
-    const atual = recarregar(u.id);
-    if (catalogo.nivel(atual.graos_total).indice < catalogo.nivelIndice(x.nivelMin)) throw new ErroNegocio('Seu nível ainda não libera esta experiência.');
-    if (atual.graos < x.graos) throw new ErroNegocio('Saldo de Grãos insuficiente.');
-    if (x.graos) lancarGraos(u.id, -x.graos, 'Agendamento: ' + x.nome, 'event');
-    db.prepare(
-      'INSERT INTO agendamentos (id, usuario_id, experiencia, nome, boutique, data, hora, necessidades, graos, criado_em) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
-    ).run(id('A'), u.id, x.id, x.nome, boutique.nome, data, hora, texto(d.necessidades, 200), x.graos, agora());
+  await transacao(async (tx) => {
+    const atual = await travar(tx, u.id);
+    if (catalogo.nivel(Number(atual.graos_total)).indice < catalogo.nivelIndice(x.nivelMin)) throw new ErroNegocio('Seu nível ainda não libera esta experiência.');
+    if (Number(atual.graos) < x.graos) throw new ErroNegocio('Saldo de Grãos insuficiente.');
+    if (x.graos) await lancarGraos(tx, u.id, -x.graos, 'Agendamento: ' + x.nome, 'event');
+    await tx.run(
+      'INSERT INTO agendamentos (id, usuario_id, experiencia, nome, boutique, data, hora, necessidades, graos, criado_em) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      id('A'), u.id, x.id, x.nome, boutique.nome, data, hora, texto(d.necessidades, 200), x.graos, agora()
+    );
   });
-  return usuarioPublico(recarregar(u.id));
+  return usuarioPublico(await recarregar(u.id));
 }
 
-function cancelarAgendamento(u, agendamentoId) {
-  transacao(() => {
-    const ag = db.prepare('SELECT * FROM agendamentos WHERE id = ? AND usuario_id = ?').get(agendamentoId, u.id);
+async function cancelarAgendamento(u, agendamentoId) {
+  await transacao(async (tx) => {
+    const ag = await tx.get('SELECT * FROM agendamentos WHERE id = ? AND usuario_id = ? FOR UPDATE', agendamentoId, u.id);
     if (!ag) throw new ErroNegocio('Agendamento não encontrado.', 404);
-    db.prepare('DELETE FROM agendamentos WHERE id = ?').run(ag.id);
-    if (ag.graos) lancarGraos(u.id, ag.graos, 'Estorno: ' + ag.nome, 'undo');
+    await tx.run('DELETE FROM agendamentos WHERE id = ?', ag.id);
+    if (Number(ag.graos)) await lancarGraos(tx, u.id, Number(ag.graos), 'Estorno: ' + ag.nome, 'undo');
   });
-  return usuarioPublico(recarregar(u.id));
+  return usuarioPublico(await recarregar(u.id));
 }
 
 // LGPD art. 18: acesso e portabilidade.
-function exportar(u) {
+async function exportar(u) {
   return {
     geradoEm: agora(),
     controlador: EMPRESA.razaoSocial + ' — CNPJ ' + EMPRESA.cnpj,
     encarregado: EMPRESA.encarregadoEmail,
-    titular: usuarioPublico(u),
-    pedidos: listarPedidos(u.id),
-    contatos: db.prepare('SELECT protocolo, data, assunto, mensagem FROM contatos WHERE usuario_id = ?').all(u.id).map((c) => ({ ...c })),
+    titular: await usuarioPublico(u),
+    pedidos: await listarPedidos(u.id),
+    contatos: await db.all('SELECT protocolo, data, assunto, mensagem FROM contatos WHERE usuario_id = ?', u.id),
   };
 }
 
 // LGPD art. 18, VI: elimina a conta; pedidos ficam sem dados pessoais (fiscal).
-function excluirConta(u) {
-  transacao(() => {
-    const pedidos = db.prepare('SELECT id, dados FROM pedidos WHERE usuario_id = ?').all(u.id);
+async function excluirConta(u) {
+  await transacao(async (tx) => {
+    const pedidos = await tx.all('SELECT id, dados FROM pedidos WHERE usuario_id = ?', u.id);
     for (const p of pedidos) {
       const dados = parse(p.dados, {});
       dados.cliente = { nome: 'Titular removido', email: null, cpf: null, telefone: null };
       if (dados.entrega && dados.entrega.endereco) dados.entrega.endereco = { cidade: dados.entrega.endereco.cidade, uf: dados.entrega.endereco.uf };
       dados.observacoes = '';
-      db.prepare('UPDATE pedidos SET usuario_id = NULL, dados = ? WHERE id = ?').run(json(dados), p.id);
+      await tx.run('UPDATE pedidos SET usuario_id = NULL, dados = ? WHERE id = ?', json(dados), p.id);
     }
-    db.prepare('UPDATE contatos SET usuario_id = NULL, nome = ?, email = ? WHERE usuario_id = ?').run('Titular removido', '', u.id);
-    db.prepare('DELETE FROM usuarios WHERE id = ?').run(u.id);
+    await tx.run('UPDATE contatos SET usuario_id = NULL, nome = ?, email = ? WHERE usuario_id = ?', 'Titular removido', '', u.id);
+    await tx.run('DELETE FROM usuarios WHERE id = ?', u.id);
   });
 }
 
@@ -329,21 +342,23 @@ function pedidoPublico(linha, incluirToken) {
     status: linha.status,
     ...dados,
     pagamento: pag,
-    graosGanhos: linha.graos_ganhos,
+    graosGanhos: Number(linha.graos_ganhos),
   };
   if (incluirToken) p.token = linha.token;
   return p;
 }
 
-function listarPedidos(usuarioId) {
-  return db.prepare('SELECT * FROM pedidos WHERE usuario_id = ? ORDER BY criado_em DESC').all(usuarioId).map((l) => pedidoPublico(l));
+async function listarPedidos(usuarioId) {
+  return (await db.all('SELECT * FROM pedidos WHERE usuario_id = ? ORDER BY criado_em DESC', usuarioId)).map((l) => pedidoPublico(l));
 }
 
-function buscarPedido(pedidoId, usuario, token) {
-  const linha = db.prepare('SELECT * FROM pedidos WHERE id = ?').get(String(pedidoId || ''));
+const buscarLinha = (pedidoId, tx = db) => tx.get('SELECT * FROM pedidos WHERE id = ?', String(pedidoId || ''));
+
+async function buscarPedido(pedidoId, usuario, token) {
+  const linha = await buscarLinha(pedidoId);
   if (!linha) return null;
   const dono = usuario && linha.usuario_id === usuario.id;
-  const comToken = token && token.length === linha.token.length && crypto.timingSafeEqual(Buffer.from(token), Buffer.from(linha.token));
+  const comToken = typeof token === 'string' && token.length === linha.token.length && crypto.timingSafeEqual(Buffer.from(token), Buffer.from(linha.token));
   return dono || comToken ? linha : null;
 }
 
@@ -356,8 +371,8 @@ async function criarPedido(usuario, d, siteUrl) {
 
   const opts = d.opts || {};
   const metodo = d.pagamento && d.pagamento.metodo === 'cartao' ? 'cartao' : 'pix';
-  const pedidosAnteriores = usuario ? db.prepare('SELECT COUNT(*) AS n FROM pedidos WHERE usuario_id = ?').get(usuario.id).n : 0;
-  const user = usuario ? { graos: usuario.graos, graosTotal: usuario.graos_total } : null;
+  const pedidosAnteriores = usuario ? Number((await db.get('SELECT COUNT(*) AS n FROM pedidos WHERE usuario_id = ?', usuario.id)).n) : 0;
+  const user = usuario ? { graos: Number(usuario.graos), graosTotal: Number(usuario.graos_total) } : null;
   const r = catalogo.calcular(itens, opts, user, pedidosAnteriores);
   if (r.avisos.length) throw new ErroNegocio(r.avisos[0].msg);
   if (r.total < 1) throw new ErroNegocio('Valor do pedido inválido.');
@@ -400,15 +415,17 @@ async function criarPedido(usuario, d, siteUrl) {
   const graosResgatados = r.usarGraos ? DATA.regras.resgateGraos.graos : 0;
 
   // Grava o pedido e debita os Grãos usados antes de falar com o pagamento.
-  transacao(() => {
+  await transacao(async (tx) => {
     if (usuario && graosResgatados) {
-      if (recarregar(usuario.id).graos < graosResgatados) throw new ErroNegocio('Saldo de Grãos insuficiente.');
-      lancarGraos(usuario.id, -graosResgatados, 'Resgate no pedido #' + pedidoId, 'redeem');
+      if (Number((await travar(tx, usuario.id)).graos) < graosResgatados) throw new ErroNegocio('Saldo de Grãos insuficiente.');
+      await lancarGraos(tx, usuario.id, -graosResgatados, 'Resgate no pedido #' + pedidoId, 'redeem');
     }
-    db.prepare(
+    await tx.run(
       `INSERT INTO pedidos (id, token, usuario_id, criado_em, atualizado_em, status, dados, pagamento, total, graos_ganhos, graos_resgatados)
-       VALUES (?, ?, ?, ?, ?, 'aguardando', ?, ?, ?, ?, ?)`
-    ).run(pedidoId, token, usuario ? usuario.id : null, agora(), agora(), json(dados), json({ metodo, provedor: pagamento.provedor }), r.total, usuario ? r.graosGanhos : 0, graosResgatados);
+       VALUES (?, ?, ?, ?, ?, 'aguardando', ?, ?, ?, ?, ?)`,
+      pedidoId, token, usuario ? usuario.id : null, agora(), agora(), json(dados), json({ metodo, provedor: pagamento.provedor }), r.total,
+      usuario ? r.graosGanhos : 0, graosResgatados
+    );
   });
 
   const urlRetorno = siteUrl + '/html/pedido.html?id=' + encodeURIComponent(pedidoId) + '&token=' + encodeURIComponent(token) + '&novo=1';
@@ -420,13 +437,13 @@ async function criarPedido(usuario, d, siteUrl) {
         : await pagamento.criarCheckoutCartao({ id: pedidoId, total: r.total, cliente, itens: dados.itens }, urlRetorno, r.parcelas);
   } catch (erro) {
     console.error('[pagamento] %s', erro.message);
-    atualizarStatus(pedidoId, 'cancelado');
+    await atualizarStatus(pedidoId, 'cancelado');
     throw new ErroNegocio('Não foi possível iniciar o pagamento agora. Nenhum valor foi cobrado. Tente novamente em instantes.', 502);
   }
-  db.prepare('UPDATE pedidos SET pagamento = ? WHERE id = ?').run(json(pag), pedidoId);
+  await db.run('UPDATE pedidos SET pagamento = ? WHERE id = ?', json(pag), pedidoId);
 
   // Cartão no modo simulado: aprovado na hora.
-  if (metodo === 'cartao' && pagamento.provedor === 'simulado') atualizarStatus(pedidoId, 'pago');
+  if (metodo === 'cartao' && pagamento.provedor === 'simulado') await atualizarStatus(pedidoId, 'pago');
   else {
     email.enviar({
       para: cliente.email,
@@ -435,11 +452,10 @@ async function criarPedido(usuario, d, siteUrl) {
     });
   }
 
-  const linha = db.prepare('SELECT * FROM pedidos WHERE id = ?').get(pedidoId);
   return {
-    pedido: pedidoPublico(linha, true),
+    pedido: pedidoPublico(await buscarLinha(pedidoId), true),
     pagamento: { checkoutUrl: pag.checkoutUrl },
-    usuario: usuario ? usuarioPublico(recarregar(usuario.id)) : undefined,
+    usuario: usuario ? await usuarioPublico(await recarregar(usuario.id)) : undefined,
   };
 }
 
@@ -447,41 +463,39 @@ async function criarPedido(usuario, d, siteUrl) {
  * Muda o status do pedido. Idempotente: Grãos são creditados uma única vez
  * no pagamento aprovado, e os Grãos usados voltam se o pagamento falhar.
  */
-function atualizarStatus(pedidoId, status, extra) {
+async function atualizarStatus(pedidoId, status, extra) {
   let aprovado = false;
-  transacao(() => {
-    const p = db.prepare('SELECT * FROM pedidos WHERE id = ?').get(pedidoId);
+  await transacao(async (tx) => {
+    const p = await tx.get('SELECT * FROM pedidos WHERE id = ? FOR UPDATE', pedidoId);
     if (!p) return;
     // Pedido pago não volta para "aguardando".
     if (p.status === 'pago' && status === 'aguardando') return;
     const pag = parse(p.pagamento, {});
+    const dados = parse(p.dados, {});
     if (extra && extra.parcelas) {
       pag.parcelas = extra.parcelas;
-      const dados = parse(p.dados, {});
       dados.valores.parcelas = extra.parcelas;
-      db.prepare('UPDATE pedidos SET dados = ? WHERE id = ?').run(json(dados), p.id);
     }
     if (extra && extra.final) pag.final = extra.final;
     if (extra && extra.paymentId) pag.idExterno = extra.paymentId;
-    db.prepare('UPDATE pedidos SET status = ?, pagamento = ?, atualizado_em = ? WHERE id = ?').run(status, json(pag), agora(), p.id);
+    await tx.run('UPDATE pedidos SET status = ?, pagamento = ?, dados = ?, atualizado_em = ? WHERE id = ?', status, json(pag), json(dados), agora(), p.id);
 
     if (status === 'pago' && p.status !== 'pago') aprovado = true;
-    if (status === 'pago' && p.usuario_id && p.graos_ganhos && !p.graos_creditados) {
-      lancarGraos(p.usuario_id, p.graos_ganhos, 'Pedido #' + p.id, 'shopping_bag');
-      db.prepare('UPDATE pedidos SET graos_creditados = 1 WHERE id = ?').run(p.id);
+    if (status === 'pago' && p.usuario_id && Number(p.graos_ganhos) && !Number(p.graos_creditados)) {
+      await lancarGraos(tx, p.usuario_id, Number(p.graos_ganhos), 'Pedido #' + p.id, 'shopping_bag');
+      await tx.run('UPDATE pedidos SET graos_creditados = 1 WHERE id = ?', p.id);
     }
-    if (['recusado', 'cancelado', 'expirado'].includes(status) && p.usuario_id && p.graos_resgatados && !p.graos_estornados) {
-      lancarGraos(p.usuario_id, p.graos_resgatados, 'Estorno do pedido #' + p.id, 'undo');
-      db.prepare('UPDATE pedidos SET graos_estornados = 1 WHERE id = ?').run(p.id);
+    if (['recusado', 'cancelado', 'expirado'].includes(status) && p.usuario_id && Number(p.graos_resgatados) && !Number(p.graos_estornados)) {
+      await lancarGraos(tx, p.usuario_id, Number(p.graos_resgatados), 'Estorno do pedido #' + p.id, 'undo');
+      await tx.run('UPDATE pedidos SET graos_estornados = 1 WHERE id = ?', p.id);
     }
   });
   if (aprovado) {
-    const p = db.prepare('SELECT * FROM pedidos WHERE id = ?').get(pedidoId);
-    const dados = parse(p.dados, {});
+    const dados = parse((await buscarLinha(pedidoId)).dados, {});
     email.enviar({
       para: dados.cliente && dados.cliente.email,
-      assunto: 'Santo Cacau — pagamento aprovado (#' + p.id + ')',
-      texto: `Pagamento do pedido #${p.id} aprovado! Seus chocolates já vão para o ateliê.\n\nSanto Cacau`,
+      assunto: 'Santo Cacau — pagamento aprovado (#' + pedidoId + ')',
+      texto: `Pagamento do pedido #${pedidoId} aprovado! Seus chocolates já vão para o ateliê.\n\nSanto Cacau`,
     });
   }
 }
@@ -490,26 +504,26 @@ function atualizarStatus(pedidoId, status, extra) {
 async function sincronizar(linha) {
   if (linha.status !== 'aguardando' || pagamento.provedor === 'simulado') return linha;
   if (linha.consultado_em && Date.now() - new Date(linha.consultado_em).getTime() < 10000) return linha;
-  db.prepare('UPDATE pedidos SET consultado_em = ? WHERE id = ?').run(agora(), linha.id);
+  await db.run('UPDATE pedidos SET consultado_em = ? WHERE id = ?', agora(), linha.id);
   try {
     const info = await pagamento.consultarPedido(linha.id);
-    if (info && info.status !== linha.status) atualizarStatus(linha.id, info.status, info);
-    else if (!info && parse(linha.pagamento, {}).pix) expirarPixVencido(linha);
+    if (info && info.status !== linha.status) await atualizarStatus(linha.id, info.status, info);
+    else if (!info) await expirarPixVencido(linha);
   } catch (erro) {
     console.error('[pagamento] consulta falhou: %s', erro.message);
   }
-  return db.prepare('SELECT * FROM pedidos WHERE id = ?').get(linha.id);
+  return buscarLinha(linha.id);
 }
 
-function expirarPixVencido(linha) {
+async function expirarPixVencido(linha) {
   const pix = parse(linha.pagamento, {}).pix;
-  if (pix && pix.expiraEm && new Date(pix.expiraEm).getTime() < Date.now() - 60000) atualizarStatus(linha.id, 'expirado');
+  if (pix && pix.expiraEm && new Date(pix.expiraEm).getTime() < Date.now() - 60000) await atualizarStatus(linha.id, 'expirado');
 }
 
 // Webhook: busca o pagamento no Mercado Pago (não confia no corpo recebido).
 async function processarWebhook(paymentId) {
   const info = await pagamento.consultarPagamento(paymentId);
-  if (info && info.pedidoId) atualizarStatus(info.pedidoId, info.status, info);
+  if (info && info.pedidoId) await atualizarStatus(info.pedidoId, info.status, info);
   return info;
 }
 
@@ -529,7 +543,8 @@ async function registrarContato(usuario, d) {
   if (!dados.assunto) throw new ErroNegocio('Escolha um assunto.');
   if (dados.mensagem.length < 10) throw new ErroNegocio('Escreva sua mensagem (mínimo de 10 caracteres).');
   const protocolo = 'AT' + Date.now().toString().slice(-6) + crypto.randomBytes(2).toString('hex').toUpperCase();
-  db.prepare('INSERT INTO contatos (protocolo, data, usuario_id, nome, email, assunto, pedido, mensagem, canal) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)').run(
+  await db.run(
+    'INSERT INTO contatos (protocolo, data, usuario_id, nome, email, assunto, pedido, mensagem, canal) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
     protocolo, agora(), usuario ? usuario.id : null, dados.nome, dados.email, dados.assunto, dados.pedido, dados.mensagem, dados.canal
   );
   const destino = /LGPD/i.test(dados.assunto) ? EMPRESA.encarregadoEmail : EMPRESA.email;
