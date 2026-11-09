@@ -12,7 +12,8 @@
     "format": "prettier --write \"www/**/*.{html,css,js}\" \"src/**/*.js\" \"server/**/*.js\" \"*.js\"",
     "app": "expo start",
     "deploy:pages": "git subtree split --prefix www -b gh-pages-temp && git push -f origin gh-pages-temp:gh-pages && git branch -D gh-pages-temp",
-    "server": "node --env-file-if-exists=.env server/index.js"
+    "server": "node --env-file-if-exists=.env server/index.js",
+    "test:smoke": "node smoke.mjs"
   },
   "dependencies": {
     "@expo/metro-runtime": "~58.0.15",
@@ -31,9 +32,13 @@
     "react-native-webview": "14.0.1"
   },
   "devDependencies": {
+    "@lhci/cli": "^0.16.0",
+    "@playwright/test": "^1.65.0",
     "concurrently": "^10.0.6",
     "http-server": "^14.1.1",
-    "prettier": "^3.9.10"
+    "jest": "^30.5.2",
+    "prettier": "^3.9.10",
+    "supertest": "^7.3.2"
   },
   "engines": {
     "node": ">=22.13"
